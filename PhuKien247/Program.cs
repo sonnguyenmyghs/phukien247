@@ -36,9 +36,11 @@ builder.Services.AddSession();
 
 var app = builder.Build();
 
-// Seed Data
+// Auto-migrate + Seed Data
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
     await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
