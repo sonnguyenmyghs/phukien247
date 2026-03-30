@@ -1,0 +1,42 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PhuKien247.Data;
+using PhuKien247.Models;
+
+namespace PhuKien247.Areas.Admin.Controllers;
+
+[Area("Admin")]
+[Authorize(Roles = "Admin")]
+public class HomeController : Controller
+{
+    private readonly ApplicationDbContext _context;
+
+    public HomeController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        ViewBag.TotalProducts = await _context.Products.CountAsync();
+        ViewBag.TotalOrders = await _context.Orders.CountAsync();
+        ViewBag.TotalRevenue = await _context.Orders
+            .Where(o => o.Status == OrderStatus.HoanThanh)
+            .SumAsync(o => o.TotalAmount);
+        ViewBag.PendingOrders = await _context.Orders
+            .Where(o => o.Status == OrderStatus.ChoXacNhan)
+            .CountAsync();
+        ViewBag.PendingRepairs = await _context.RepairBookings
+            .Where(r => r.Status == RepairStatus.ChoXacNhan)
+            .CountAsync();
+
+        var recentOrders = await _context.Orders
+            .Include(o => o.User)
+            .OrderByDescending(o => o.CreatedAt)
+            .Take(10)
+            .ToListAsync();
+
+        return View(recentOrders);
+    }
+}

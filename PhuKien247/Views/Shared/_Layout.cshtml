@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PhuKien247</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YcnS/1BQZGVh5CYpBfFlsLDMz93q6UyElph" crossorigin="anonymous" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --pk-orange: #FF6B35;
+            --pk-orange-dark: #e55a26;
+            --pk-dark: #1a1a2e;
+            --pk-gray: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* Navbar */
+        .navbar-pk {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 0.6rem 0;
+        }
+
+        .navbar-pk .navbar-brand {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--pk-orange) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-pk .navbar-brand i {
+            margin-right: 6px;
+        }
+
+        .navbar-pk .nav-link {
+            color: var(--pk-dark) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: color 0.2s;
+        }
+
+        .navbar-pk .nav-link:hover,
+        .navbar-pk .nav-link.active {
+            color: var(--pk-orange) !important;
+        }
+
+        .btn-pk {
+            background-color: var(--pk-orange);
+            border-color: var(--pk-orange);
+            color: #fff;
+        }
+
+        .btn-pk:hover {
+            background-color: var(--pk-orange-dark);
+            border-color: var(--pk-orange-dark);
+            color: #fff;
+        }
+
+        .btn-pk-outline {
+            border-color: var(--pk-orange);
+            color: var(--pk-orange);
+        }
+
+        .btn-pk-outline:hover {
+            background-color: var(--pk-orange);
+            color: #fff;
+        }
+
+        .badge-pk {
+            background-color: var(--pk-orange);
+        }
+
+        /* Footer */
+        .footer-pk {
+            background-color: var(--pk-dark);
+            color: #ccc;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-pk h5 {
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            position: relative;
+            padding-bottom: 0.6rem;
+        }
+
+        .footer-pk h5::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--pk-orange);
+            border-radius: 2px;
+        }
+
+        .footer-pk a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-pk a:hover {
+            color: var(--pk-orange);
+        }
+
+        .footer-pk .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            margin-right: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .footer-pk .social-icons a:hover {
+            background-color: var(--pk-orange);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1.2rem;
+            margin-top: 2rem;
+        }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-pk sticky-top">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-mobile-alt"></i>PhuKien247
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home me-1"></i>Trang ch&#7911;
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Product" asp-action="Index">
+                            <i class="fas fa-box-open me-1"></i>S&#7843;n ph&#7849;m
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="RepairService" asp-action="Index">
+                            <i class="fas fa-tools me-1"></i>D&#7883;ch v&#7909; s&#7917;a ch&#7919;a
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Cart" asp-action="Index">
+                            <i class="fas fa-shopping-cart me-1"></i>Gi&#7887; h&agrave;ng
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-cog me-1"></i>Qu&#7843;n tr&#7883;
+                            </a>
+                        }
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-pk dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i>@User.Identity.Name
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <i class="fas fa-id-card me-2"></i>T&agrave;i kho&#7843;n
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Order" asp-action="MyOrders">
+                                        <i class="fas fa-clipboard-list me-2"></i>&#272;&#417;n h&agrave;ng
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-0">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>&#272;&#259;ng xu&#7845;t
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-pk-outline">
+                            <i class="fas fa-sign-in-alt me-1"></i>&#272;&#259;ng nh&#7853;p
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-sm btn-pk">
+                            <i class="fas fa-user-plus me-1"></i>&#272;&#259;ng k&yacute;
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-pk">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5><i class="fas fa-mobile-alt me-2"></i>PhuKien247</h5>
+                    <p>Chuy&ecirc;n cung c&#7845;p ph&#7909; ki&#7879;n &#273;i&#7879;n tho&#7841;i ch&iacute;nh h&atilde;ng v&agrave; d&#7883;ch v&#7909; s&#7917;a ch&#7919;a uy t&iacute;n t&#7841;i Vi&#7879;t Nam. Ch&uacute;ng t&ocirc;i cam k&#7871;t mang &#273;&#7871;n s&#7843;n ph&#7849;m ch&#7845;t l&#432;&#7907;ng v&#7899;i gi&aacute; c&#7843; h&#7907;p l&yacute; nh&#7845;t.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Li&ecirc;n k&#7871;t</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Index">Trang ch&#7911;</a></li>
+                        <li class="mb-2"><a asp-controller="Product" asp-action="Index">S&#7843;n ph&#7849;m</a></li>
+                        <li class="mb-2"><a asp-controller="RepairService" asp-action="Index">S&#7917;a ch&#7919;a</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Privacy">Ch&iacute;nh s&aacute;ch</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5>H&#7895; tr&#7907;</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">H&#432;&#7899;ng d&#7851;n mua h&agrave;ng</a></li>
+                        <li class="mb-2"><a href="#">Ch&iacute;nh s&aacute;ch &#273;&#7893;i tr&#7843;</a></li>
+                        <li class="mb-2"><a href="#">Ch&iacute;nh s&aacute;ch b&#7843;o h&agrave;nh</a></li>
+                        <li class="mb-2"><a href="#">C&acirc;u h&#7887;i th&#432;&#7901;ng g&#7863;p</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5>Li&ecirc;n h&#7879;</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2" style="color: var(--pk-orange);"></i>
+                            123 Nguy&#7877;n Tr&atilde;i, Q.1, TP.HCM
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2" style="color: var(--pk-orange);"></i>
+                            0123 456 789
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2" style="color: var(--pk-orange);"></i>
+                            info&#64;phukien247.vn
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2" style="color: var(--pk-orange);"></i>
+                            8:00 - 21:00 (T2 - CN)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom text-center">
+                <small>&copy; 2026 PhuKien247. T&#7845;t c&#7843; quy&#7873;n &#273;&#432;&#7907;c b&#7843;o l&#432;u.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

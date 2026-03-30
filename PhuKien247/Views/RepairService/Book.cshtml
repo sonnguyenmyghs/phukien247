@@ -1,0 +1,93 @@
+@{
+    var service = ViewBag.Service as RepairService;
+    ViewData["Title"] = "Đặt lịch sửa chữa - " + service?.Name;
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="RepairService" asp-action="Index">Dịch vụ sửa chữa</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Đặt lịch</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Đặt lịch sửa chữa</h4>
+                </div>
+                <div class="card-body">
+                    @if (service != null)
+                    {
+                        <!-- Service Info -->
+                        <div class="alert alert-info mb-4">
+                            <h5 class="mb-1">@service.Name</h5>
+                            <p class="mb-1">Giá dịch vụ: <strong class="text-danger">@service.Price.ToString("N0") đ</strong></p>
+                            @if (!string.IsNullOrEmpty(service.EstimatedTime))
+                            {
+                                <p class="mb-0">Thời gian ước tính: <strong>@service.EstimatedTime</strong></p>
+                            }
+                        </div>
+
+                        <form asp-controller="RepairService" asp-action="Book" asp-route-serviceId="@service.Id" method="post">
+                            <!-- Service Name (readonly) -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dịch vụ</label>
+                                <input type="text" class="form-control" value="@service.Name" readonly />
+                            </div>
+
+                            <!-- Device Info -->
+                            <div class="mb-3">
+                                <label for="deviceInfo" class="form-label fw-bold">Thông tin thiết bị <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="deviceInfo" name="deviceInfo"
+                                       placeholder="Ví dụ: iPhone 15 Pro Max, Samsung Galaxy S24..."
+                                       required />
+                                @if (ViewContext.ModelState.ContainsKey("DeviceInfo") && ViewContext.ModelState["DeviceInfo"]!.Errors.Any())
+                                {
+                                    <span class="text-danger">@ViewContext.ModelState["DeviceInfo"]!.Errors.First().ErrorMessage</span>
+                                }
+                            </div>
+
+                            <!-- Issue Description -->
+                            <div class="mb-3">
+                                <label for="issueDescription" class="form-label fw-bold">Mô tả tình trạng</label>
+                                <textarea class="form-control" id="issueDescription" name="issueDescription" rows="4"
+                                          placeholder="Mô tả chi tiết tình trạng hư hỏng của thiết bị..."></textarea>
+                            </div>
+
+                            <!-- Booking Date -->
+                            <div class="mb-3">
+                                <label for="bookingDate" class="form-label fw-bold">Ngày hẹn <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="bookingDate" name="bookingDate"
+                                       min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                                @if (ViewContext.ModelState.ContainsKey("BookingDate") && ViewContext.ModelState["BookingDate"]!.Errors.Any())
+                                {
+                                    <span class="text-danger">@ViewContext.ModelState["BookingDate"]!.Errors.First().ErrorMessage</span>
+                                }
+                            </div>
+
+                            <!-- Note -->
+                            <div class="mb-3">
+                                <label for="note" class="form-label fw-bold">Ghi chú thêm</label>
+                                <textarea class="form-control" id="note" name="note" rows="2"
+                                          placeholder="Ghi chú thêm nếu có (thời gian thuận tiện, yêu cầu đặc biệt...)"></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a asp-controller="RepairService" asp-action="Index" class="btn btn-outline-secondary">
+                                    Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-calendar-check"></i> Xác nhận đặt lịch
+                                </button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

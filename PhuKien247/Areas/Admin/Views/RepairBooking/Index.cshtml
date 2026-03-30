@@ -1,0 +1,94 @@
+@model List<RepairBooking>
+@{
+    ViewData["Title"] = "Quản lý lịch sửa chữa";
+}
+
+<h5 class="mb-3">Danh sách lịch sửa chữa</h5>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Khách hàng</th>
+                        <th>Dịch vụ</th>
+                        <th>Thiết bị</th>
+                        <th>Mô tả lỗi</th>
+                        <th>Ngày hẹn</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th>Cập nhật</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td>@booking.Id</td>
+                            <td>@booking.User.FullName</td>
+                            <td>@booking.Service.Name</td>
+                            <td>@booking.DeviceInfo</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(booking.IssueDescription))
+                                {
+                                    <span title="@booking.IssueDescription">
+                                        @(booking.IssueDescription.Length > 40 ? booking.IssueDescription.Substring(0, 40) + "..." : booking.IssueDescription)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @switch (booking.Status)
+                                {
+                                    case RepairStatus.ChoXacNhan:
+                                        <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                        break;
+                                    case RepairStatus.DaTiepNhan:
+                                        <span class="badge bg-info">Đã tiếp nhận</span>
+                                        break;
+                                    case RepairStatus.DangSua:
+                                        <span class="badge bg-primary">Đang sửa</span>
+                                        break;
+                                    case RepairStatus.HoanThanh:
+                                        <span class="badge bg-success">Hoàn thành</span>
+                                        break;
+                                    case RepairStatus.DaHuy:
+                                        <span class="badge bg-danger">Đã hủy</span>
+                                        break;
+                                }
+                            </td>
+                            <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <form asp-area="Admin" asp-controller="RepairBooking" asp-action="UpdateStatus" asp-route-id="@booking.Id"
+                                      method="post" class="d-flex gap-1">
+                                    <select name="status" class="form-select form-select-sm" style="width:140px;">
+                                        <option value="@RepairStatus.ChoXacNhan" selected="@(booking.Status == RepairStatus.ChoXacNhan)">Chờ xác nhận</option>
+                                        <option value="@RepairStatus.DaTiepNhan" selected="@(booking.Status == RepairStatus.DaTiepNhan)">Đã tiếp nhận</option>
+                                        <option value="@RepairStatus.DangSua" selected="@(booking.Status == RepairStatus.DangSua)">Đang sửa</option>
+                                        <option value="@RepairStatus.HoanThanh" selected="@(booking.Status == RepairStatus.HoanThanh)">Hoàn thành</option>
+                                        <option value="@RepairStatus.DaHuy" selected="@(booking.Status == RepairStatus.DaHuy)">Đã hủy</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">Chưa có lịch sửa chữa nào</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

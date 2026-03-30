@@ -1,0 +1,164 @@
+@model Product
+@{
+    ViewData["Title"] = Model.Name;
+    var averageRating = Model.Reviews.Any() ? Model.Reviews.Average(r => r.Rating) : 0;
+}
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
+        <li class="breadcrumb-item">
+            <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category.Name</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- Product Image -->
+    <div class="col-md-5 mb-4">
+        <div class="card">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name"
+                     style="max-height: 400px; object-fit: cover;" />
+            }
+            else
+            {
+                <div class="bg-light d-flex align-items-center justify-content-center"
+                     style="height: 400px;">
+                    <span class="text-muted fs-5">Chưa có ảnh sản phẩm</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="col-md-7 mb-4">
+        <h2 class="mb-2">@Model.Name</h2>
+
+        <p class="text-muted mb-2">
+            Thương hiệu: <strong>@Model.Brand.Name</strong> |
+            Danh mục: <strong>@Model.Category.Name</strong>
+        </p>
+
+        @if (Model.Reviews.Any())
+        {
+            <p class="mb-2">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= Math.Round(averageRating))
+                    {
+                        <span class="text-warning">&#9733;</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">&#9733;</span>
+                    }
+                }
+                <span class="text-muted ms-1">(@Model.Reviews.Count đánh giá)</span>
+            </p>
+        }
+
+        <div class="mb-3">
+            @if (Model.SalePrice.HasValue && Model.SalePrice < Model.Price)
+            {
+                <span class="text-decoration-line-through text-muted fs-5 me-2">@Model.Price.ToString("N0") đ</span>
+                <span class="text-danger fw-bold fs-3">@Model.SalePrice.Value.ToString("N0") đ</span>
+                var discount = Math.Round((Model.Price - Model.SalePrice.Value) / Model.Price * 100);
+                <span class="badge bg-danger ms-2">-@discount%</span>
+            }
+            else
+            {
+                <span class="text-danger fw-bold fs-3">@Model.Price.ToString("N0") đ</span>
+            }
+        </div>
+
+        <!-- Stock Status -->
+        <div class="mb-3">
+            @if (Model.Stock > 0)
+            {
+                <span class="badge bg-success fs-6">Còn hàng (@Model.Stock sản phẩm)</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary fs-6">Hết hàng</span>
+            }
+        </div>
+
+        <!-- Description -->
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <div class="mb-3">
+                <h5>Mô tả sản phẩm</h5>
+                <p>@Model.Description</p>
+            </div>
+        }
+
+        <!-- Add to Cart -->
+        @if (Model.Stock > 0)
+        {
+            <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex align-items-center gap-2 mt-3">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <label for="quantity" class="fw-bold text-nowrap">Số lượng:</label>
+                <input type="number" name="quantity" id="quantity" value="1" min="1" max="@Model.Stock"
+                       class="form-control" style="width: 80px;" />
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
+                </button>
+            </form>
+        }
+        else
+        {
+            <button class="btn btn-secondary btn-lg mt-3" disabled>Hết hàng</button>
+        }
+    </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Đánh giá từ khách hàng (@Model.Reviews.Count)</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Reviews.Any())
+                {
+                    @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
+                    {
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong>@review.User.FullName</strong>
+                                <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            </div>
+                            <div class="mb-1">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= review.Rating)
+                                    {
+                                        <span class="text-warning">&#9733;</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">&#9733;</span>
+                                    }
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(review.Comment))
+                            {
+                                <p class="mb-0">@review.Comment</p>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center mb-0">Chưa có đánh giá nào cho sản phẩm này.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
