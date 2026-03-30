@@ -3,60 +3,297 @@
     ViewData["Title"] = "Đăng ký";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm mt-4">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Đăng ký tài khoản</h3>
+@section Styles {
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        .register-bg {
+            min-height: calc(100vh - 200px);
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 50%, #ffd6c4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .register-bg::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            left: -15%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .register-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -25%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .register-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+            overflow: hidden;
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .register-accent-bar {
+            height: 5px;
+            background: linear-gradient(90deg, #FF6B35, #ff9a6c, #FF6B35);
+        }
+        .register-header {
+            text-align: center;
+            padding: 2.5rem 2rem 0.5rem;
+        }
+        .register-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 25px rgba(255,107,53,0.3);
+        }
+        .register-icon i {
+            font-size: 1.8rem;
+            color: #fff;
+        }
+        .register-header h3 {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 0.3rem;
+        }
+        .register-header p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .register-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+        .register-body .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 0.4rem;
+        }
+        .register-body .form-control {
+            border-radius: 12px;
+            padding: 0.7rem 1rem 0.7rem 2.8rem;
+            border: 1.5px solid #e0e0e0;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .register-body .form-control:focus {
+            border-color: #FF6B35;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+        .input-icon-wrap {
+            position: relative;
+        }
+        .input-icon-wrap .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .input-icon-wrap .form-control:focus ~ .input-icon,
+        .input-icon-wrap .form-control:not(:placeholder-shown) ~ .input-icon {
+            color: #FF6B35;
+        }
+        .field-step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+        .field-step .step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .btn-register {
+            background: linear-gradient(135deg, #FF6B35, #e55a26);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+            letter-spacing: 0.3px;
+        }
+        .btn-register:hover {
+            background: linear-gradient(135deg, #e55a26, #d14e1d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,107,53,0.35);
+            color: #fff;
+        }
+        .btn-register:active {
+            transform: translateY(0);
+        }
+        .register-footer {
+            text-align: center;
+            padding: 0 2rem 2rem;
+        }
+        .register-footer .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .register-footer .divider::before,
+        .register-footer .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e8e8e8;
+        }
+        .register-footer .divider span {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+        .register-footer a {
+            color: #FF6B35;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .register-footer a:hover {
+            color: #e55a26;
+            text-decoration: underline;
+        }
+    </style>
+}
 
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<section class="register-bg">
+    <div class="register-card" data-aos="fade-up" data-aos-duration="600">
+        <div class="register-accent-bar"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="FullName" class="form-label">Họ tên</label>
-                        <input asp-for="FullName" class="form-control" placeholder="Nhập họ tên" />
-                        <span asp-validation-for="FullName" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">Email</label>
-                        <input asp-for="Email" class="form-control" placeholder="Nhập email" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="PhoneNumber" class="form-label">Số điện thoại</label>
-                        <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label">Mật khẩu</label>
-                        <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
-                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Đăng ký</button>
-                    </div>
-                </form>
-
-                <hr />
-                <p class="text-center mb-0">
-                    Đã có tài khoản?
-                    <a asp-action="Login">Đăng nhập</a>
-                </p>
+        <div class="register-header">
+            <div class="register-icon">
+                <i class="fas fa-user-plus"></i>
             </div>
+            <h3>Tạo tài khoản mới</h3>
+            <p>Tham gia PhuKien247 để nhận ưu đãi hấp dẫn</p>
+        </div>
+
+        <div class="register-body">
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 rounded-3" style="display:none;"></div>
+
+                <div class="mb-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="field-step">
+                        <span class="step-num">1</span>
+                        <label asp-for="FullName" class="form-label mb-0">Họ tên</label>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <input asp-for="FullName" class="form-control" placeholder="Nhập họ tên đầy đủ" />
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3" data-aos="fade-up" data-aos-delay="150">
+                    <div class="field-step">
+                        <span class="step-num">2</span>
+                        <label asp-for="Email" class="form-label mb-0">Email</label>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <input asp-for="Email" class="form-control" placeholder="Nhập địa chỉ email" />
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="field-step">
+                        <span class="step-num">3</span>
+                        <label asp-for="PhoneNumber" class="form-label mb-0">Số điện thoại</label>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                        <i class="fas fa-phone input-icon"></i>
+                    </div>
+                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3" data-aos="fade-up" data-aos-delay="250">
+                    <div class="field-step">
+                        <span class="step-num">4</span>
+                        <label asp-for="Password" class="form-label mb-0">Mật khẩu</label>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <input asp-for="Password" class="form-control" placeholder="Tối thiểu 6 ký tự" />
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="field-step">
+                        <span class="step-num">5</span>
+                        <label asp-for="ConfirmPassword" class="form-label mb-0">Xác nhận mật khẩu</label>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" />
+                        <i class="fas fa-shield-alt input-icon"></i>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <div class="d-grid" data-aos="fade-up" data-aos-delay="350">
+                    <button type="submit" class="btn btn-register">
+                        <i class="fas fa-user-plus me-2"></i>Đăng ký tài khoản
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="register-footer" data-aos="fade-up" data-aos-delay="400">
+            <div class="divider"><span>hoặc</span></div>
+            <p class="mb-0" style="color: #666;">
+                Đã có tài khoản?
+                <a asp-action="Login">Đăng nhập</a>
+            </p>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true });
+        document.addEventListener('DOMContentLoaded', function() {
+            var summary = document.querySelector('[data-valmsg-summary]');
+            if (summary && summary.querySelector('li')) {
+                summary.style.display = 'block';
+            }
+        });
+    </script>
 }

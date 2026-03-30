@@ -2,163 +2,582 @@
 @{
     ViewData["Title"] = Model.Name;
     var averageRating = Model.Reviews.Any() ? Model.Reviews.Average(r => r.Rating) : 0;
+    var hasDiscount = Model.SalePrice.HasValue && Model.SalePrice < Model.Price;
+    var discount = hasDiscount ? Math.Round((Model.Price - Model.SalePrice!.Value) / Model.Price * 100) : 0;
+
+    string fallbackSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='500' viewBox='0 0 600 500'%3E%3Crect fill='%23f5f5f5' width='600' height='500'/%3E%3Ctext x='50%25' y='42%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='64' fill='%23ddd'%3E%F0%9F%93%B1%3C/text%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%23bbb'%3ECh%C6%B0a c%C3%B3 %E1%BA%A3nh s%E1%BA%A3n ph%E1%BA%A9m%3C/text%3E%3C/svg%3E";
 }
 
-<!-- Breadcrumb -->
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-        <li class="breadcrumb-item"><a asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
-        <li class="breadcrumb-item">
-            <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category.Name</a>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
-    </ol>
-</nav>
+@section Styles {
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        /* Breadcrumb */
+        .breadcrumb-modern {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+        }
+        .breadcrumb-modern .breadcrumb {
+            margin-bottom: 0;
+        }
+        .breadcrumb-modern .breadcrumb-item a {
+            color: var(--pk-orange);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .breadcrumb-modern .breadcrumb-item a:hover {
+            color: var(--pk-orange-dark);
+        }
+        .breadcrumb-modern .breadcrumb-item.active {
+            color: #666;
+            font-weight: 600;
+        }
 
-<div class="row">
-    <!-- Product Image -->
-    <div class="col-md-5 mb-4">
-        <div class="card">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        /* Image Section */
+        .product-image-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            background: #fafafa;
+            position: relative;
+        }
+        .product-image-card .img-wrapper {
+            position: relative;
+            overflow: hidden;
+            cursor: zoom-in;
+        }
+        .product-image-card .img-wrapper img {
+            width: 100%;
+            max-height: 480px;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .product-image-card .img-wrapper:hover img {
+            transform: scale(1.08);
+        }
+        .product-image-card .img-wrapper .zoom-hint {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 0.3rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .product-image-card .img-wrapper:hover .zoom-hint {
+            opacity: 1;
+        }
+        .discount-badge-lg {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            z-index: 2;
+            animation: pulseBadge 2s ease-in-out infinite;
+        }
+        @@keyframes pulseBadge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,65,108,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(255,65,108,0); }
+        }
+
+        /* Product Info */
+        .product-info-section {
+            padding-left: 1rem;
+        }
+        .product-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--pk-dark);
+            line-height: 1.3;
+            margin-bottom: 0.8rem;
+        }
+        .badge-brand, .badge-category {
+            padding: 0.35rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-brand {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .badge-category {
+            background: #e8f4fd;
+            color: #1976d2;
+        }
+
+        /* Star Rating */
+        .star-rating .fa-star {
+            font-size: 1.1rem;
+            margin-right: 2px;
+        }
+        .star-filled {
+            color: #ffc107;
+        }
+        .star-empty {
+            color: #ddd;
+        }
+
+        /* Price */
+        .price-block {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff0eb 100%);
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            margin: 1rem 0;
+        }
+        .price-block .sale-price {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #e53935;
+        }
+        .price-block .original-price {
+            font-size: 1.1rem;
+            text-decoration: line-through;
+            color: #999;
+        }
+        .price-block .discount-pct {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: #fff;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Stock */
+        .stock-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .stock-in {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .stock-out {
+            background: #f5f5f5;
+            color: #757575;
+        }
+
+        /* Quantity Selector */
+        .qty-selector {
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .qty-selector .qty-btn {
+            width: 42px;
+            height: 42px;
+            border: none;
+            background: #f8f8f8;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .qty-selector .qty-btn:hover {
+            background: var(--pk-orange);
+            color: #fff;
+        }
+        .qty-selector input {
+            width: 55px;
+            height: 42px;
+            text-align: center;
+            border: none;
+            border-left: 2px solid #e0e0e0;
+            border-right: 2px solid #e0e0e0;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--pk-dark);
+            outline: none;
+        }
+
+        /* Add to Cart */
+        .btn-add-cart-lg {
+            border: none;
+            border-radius: 14px;
+            padding: 0.9rem 2.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--pk-orange), var(--pk-orange-dark));
+            color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+        }
+        .btn-add-cart-lg:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,107,53,0.4);
+            color: #fff;
+        }
+        .btn-disabled-lg {
+            border: none;
+            border-radius: 14px;
+            padding: 0.9rem 2.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        /* Description */
+        .description-section {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .description-section .desc-header {
+            background: linear-gradient(135deg, var(--pk-dark), #16213e);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .description-section .desc-body {
+            padding: 1.5rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .reviews-header {
+            background: linear-gradient(135deg, var(--pk-dark), #16213e);
+            color: #fff;
+            padding: 1.2rem 1.5rem;
+        }
+        .reviews-header h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+        .avg-rating-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .avg-rating-box .big-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffc107;
+        }
+
+        /* Review Card */
+        .review-card {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.3s;
+        }
+        .review-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+        .review-card .reviewer-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pk-orange), var(--pk-orange-dark));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .review-card .reviewer-name {
+            font-weight: 700;
+            color: var(--pk-dark);
+        }
+        .review-card .review-date {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        .review-card .review-comment {
+            color: #555;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+
+        .empty-reviews {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #999;
+        }
+        .empty-reviews i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 0.8rem;
+        }
+    </style>
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-modern mb-4" data-aos="fade-down" data-aos-duration="400">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
+                <li class="breadcrumb-item">
+                    <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category.Name</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Product Image -->
+        <div class="col-lg-5 col-md-6" data-aos="fade-right" data-aos-duration="600">
+            <div class="product-image-card">
+                @if (hasDiscount)
+                {
+                    <span class="discount-badge-lg">-@discount%</span>
+                }
+                <div class="img-wrapper">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? fallbackSvg : Model.ImageUrl)" alt="@Model.Name" />
+                    <span class="zoom-hint"><i class="fas fa-search-plus me-1"></i>Di chuột để phóng to</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-7 col-md-6" data-aos="fade-left" data-aos-duration="600" data-aos-delay="100">
+            <div class="product-info-section">
+                <h1 class="product-title">@Model.Name</h1>
+
+                <!-- Badges -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge-brand"><i class="fas fa-award me-1"></i>@Model.Brand.Name</span>
+                    <span class="badge-category"><i class="fas fa-layer-group me-1"></i>@Model.Category.Name</span>
+                </div>
+
+                <!-- Star Rating -->
+                @if (Model.Reviews.Any())
+                {
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="star-rating">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Round(averageRating))
+                                {
+                                    <i class="fas fa-star star-filled"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-star star-empty"></i>
+                                }
+                            }
+                        </div>
+                        <span class="text-muted">(@averageRating.ToString("0.1")/5 - @Model.Reviews.Count đánh giá)</span>
+                    </div>
+                }
+
+                <!-- Price Block -->
+                <div class="price-block" data-aos="fade-up" data-aos-duration="400" data-aos-delay="200">
+                    @if (hasDiscount)
+                    {
+                        <div class="d-flex align-items-center flex-wrap gap-3">
+                            <span class="sale-price">@Model.SalePrice!.Value.ToString("N0") đ</span>
+                            <span class="original-price">@Model.Price.ToString("N0") đ</span>
+                            <span class="discount-pct"><i class="fas fa-fire me-1"></i>Giảm @discount%</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="sale-price">@Model.Price.ToString("N0") đ</span>
+                    }
+                </div>
+
+                <!-- Stock Status -->
+                <div class="mb-3">
+                    @if (Model.Stock > 0)
+                    {
+                        <span class="stock-badge stock-in">
+                            <i class="fas fa-check-circle me-1"></i>Còn hàng (@Model.Stock sản phẩm)
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="stock-badge stock-out">
+                            <i class="fas fa-times-circle me-1"></i>Hết hàng
+                        </span>
+                    }
+                </div>
+
+                <!-- Add to Cart Form -->
+                @if (Model.Stock > 0)
+                {
+                    <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="300">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <label class="fw-bold text-nowrap">Số lượng:</label>
+                            <div class="qty-selector">
+                                <button type="button" class="qty-btn" onclick="changeQty(-1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" max="@Model.Stock" readonly />
+                                <button type="button" class="qty-btn" onclick="changeQty(1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-add-cart-lg">
+                            <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <button class="btn-disabled-lg mt-4" disabled>
+                        <i class="fas fa-ban me-2"></i>Hết hàng
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <div class="description-section mb-4" data-aos="fade-up" data-aos-duration="500">
+            <div class="desc-header" data-bs-toggle="collapse" data-bs-target="#descContent" aria-expanded="true">
+                <span><i class="fas fa-info-circle me-2"></i>Mô tả sản phẩm</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="collapse show" id="descContent">
+                <div class="desc-body">
+                    @Model.Description
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Reviews Section -->
+    <div class="reviews-section" data-aos="fade-up" data-aos-duration="500" data-aos-delay="100">
+        <div class="reviews-header">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <h5><i class="fas fa-comments me-2"></i>Đánh giá từ khách hàng (@Model.Reviews.Count)</h5>
+                @if (Model.Reviews.Any())
+                {
+                    <div class="avg-rating-box">
+                        <span class="big-number">@averageRating.ToString("0.1")</span>
+                        <div>
+                            <div class="star-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Round(averageRating))
+                                    {
+                                        <i class="fas fa-star" style="color: #ffc107;"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-star" style="color: rgba(255,255,255,0.3);"></i>
+                                    }
+                                }
+                            </div>
+                            <small style="color: rgba(255,255,255,0.7);">@Model.Reviews.Count đánh giá</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="p-4">
+            @if (Model.Reviews.Any())
             {
-                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name"
-                     style="max-height: 400px; object-fit: cover;" />
+                @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
+                {
+                    <div class="review-card" data-aos="fade-up" data-aos-duration="400">
+                        <div class="d-flex gap-3">
+                            <div class="reviewer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                                    <div>
+                                        <span class="reviewer-name">@review.User.FullName</span>
+                                        <div class="star-rating mt-1">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <i class="fas fa-star star-filled" style="font-size: 0.85rem;"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-star star-empty" style="font-size: 0.85rem;"></i>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    <span class="review-date">
+                                        <i class="far fa-clock me-1"></i>@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(review.Comment))
+                                {
+                                    <p class="review-comment">@review.Comment</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
             }
             else
             {
-                <div class="bg-light d-flex align-items-center justify-content-center"
-                     style="height: 400px;">
-                    <span class="text-muted fs-5">Chưa có ảnh sản phẩm</span>
+                <div class="empty-reviews">
+                    <i class="far fa-comment-dots d-block"></i>
+                    <h5 class="text-muted">Chưa có đánh giá nào</h5>
+                    <p class="text-muted mb-0">Hãy là người đầu tiên đánh giá sản phẩm này!</p>
                 </div>
             }
         </div>
     </div>
-
-    <!-- Product Info -->
-    <div class="col-md-7 mb-4">
-        <h2 class="mb-2">@Model.Name</h2>
-
-        <p class="text-muted mb-2">
-            Thương hiệu: <strong>@Model.Brand.Name</strong> |
-            Danh mục: <strong>@Model.Category.Name</strong>
-        </p>
-
-        @if (Model.Reviews.Any())
-        {
-            <p class="mb-2">
-                @for (int i = 1; i <= 5; i++)
-                {
-                    if (i <= Math.Round(averageRating))
-                    {
-                        <span class="text-warning">&#9733;</span>
-                    }
-                    else
-                    {
-                        <span class="text-muted">&#9733;</span>
-                    }
-                }
-                <span class="text-muted ms-1">(@Model.Reviews.Count đánh giá)</span>
-            </p>
-        }
-
-        <div class="mb-3">
-            @if (Model.SalePrice.HasValue && Model.SalePrice < Model.Price)
-            {
-                <span class="text-decoration-line-through text-muted fs-5 me-2">@Model.Price.ToString("N0") đ</span>
-                <span class="text-danger fw-bold fs-3">@Model.SalePrice.Value.ToString("N0") đ</span>
-                var discount = Math.Round((Model.Price - Model.SalePrice.Value) / Model.Price * 100);
-                <span class="badge bg-danger ms-2">-@discount%</span>
-            }
-            else
-            {
-                <span class="text-danger fw-bold fs-3">@Model.Price.ToString("N0") đ</span>
-            }
-        </div>
-
-        <!-- Stock Status -->
-        <div class="mb-3">
-            @if (Model.Stock > 0)
-            {
-                <span class="badge bg-success fs-6">Còn hàng (@Model.Stock sản phẩm)</span>
-            }
-            else
-            {
-                <span class="badge bg-secondary fs-6">Hết hàng</span>
-            }
-        </div>
-
-        <!-- Description -->
-        @if (!string.IsNullOrEmpty(Model.Description))
-        {
-            <div class="mb-3">
-                <h5>Mô tả sản phẩm</h5>
-                <p>@Model.Description</p>
-            </div>
-        }
-
-        <!-- Add to Cart -->
-        @if (Model.Stock > 0)
-        {
-            <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex align-items-center gap-2 mt-3">
-                <input type="hidden" name="productId" value="@Model.Id" />
-                <label for="quantity" class="fw-bold text-nowrap">Số lượng:</label>
-                <input type="number" name="quantity" id="quantity" value="1" min="1" max="@Model.Stock"
-                       class="form-control" style="width: 80px;" />
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
-                </button>
-            </form>
-        }
-        else
-        {
-            <button class="btn btn-secondary btn-lg mt-3" disabled>Hết hàng</button>
-        }
-    </div>
 </div>
 
-<!-- Reviews Section -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Đánh giá từ khách hàng (@Model.Reviews.Count)</h5>
-            </div>
-            <div class="card-body">
-                @if (Model.Reviews.Any())
-                {
-                    @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
-                    {
-                        <div class="border-bottom pb-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <strong>@review.User.FullName</strong>
-                                <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
-                            </div>
-                            <div class="mb-1">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    if (i <= review.Rating)
-                                    {
-                                        <span class="text-warning">&#9733;</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">&#9733;</span>
-                                    }
-                                }
-                            </div>
-                            @if (!string.IsNullOrEmpty(review.Comment))
-                            {
-                                <p class="mb-0">@review.Comment</p>
-                            }
-                        </div>
-                    }
-                }
-                else
-                {
-                    <p class="text-muted text-center mb-0">Chưa có đánh giá nào cho sản phẩm này.</p>
-                }
-            </div>
-        </div>
-    </div>
-</div>
+@section Scripts {
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 60 });
+
+        function changeQty(delta) {
+            var input = document.getElementById('quantity');
+            var newVal = parseInt(input.value) + delta;
+            var min = parseInt(input.min);
+            var max = parseInt(input.max);
+            if (newVal >= min && newVal <= max) {
+                input.value = newVal;
+            }
+        }
+    </script>
+}

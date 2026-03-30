@@ -4,73 +4,358 @@
     ViewData["Title"] = "Đặt hàng thành công";
 }
 
-<div class="container py-4">
-    <div class="text-center mb-4">
-        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
-        <h2 class="text-success">Đặt hàng thành công!</h2>
-        <p class="text-muted fs-5">Cảm ơn bạn đã mua hàng tại PhuKien247</p>
-    </div>
+@section Styles {
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        .confirmation-page {
+            background: #f5f5f7;
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0 3rem;
+        }
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-sm-4 text-muted">Mã đơn hàng:</div>
-                        <div class="col-sm-8 fw-bold">#@Model.Id</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 text-muted">Ngày đặt:</div>
-                        <div class="col-sm-8">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 text-muted">Địa chỉ giao hàng:</div>
-                        <div class="col-sm-8">@Model.ShippingAddress</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 text-muted">Số điện thoại:</div>
-                        <div class="col-sm-8">@Model.PhoneNumber</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 text-muted">Phương thức thanh toán:</div>
-                        <div class="col-sm-8">
-                            @if (Model.PaymentMethod == PhuKien247.Models.PaymentMethod.COD)
-                            {
-                                <span>Thanh toán khi nhận hàng (COD)</span>
-                            }
-                            else
-                            {
-                                <span>Chuyển khoản ngân hàng</span>
-                            }
-                        </div>
-                    </div>
-                    @if (!string.IsNullOrEmpty(Model.Note))
-                    {
-                        <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Ghi chú:</div>
-                            <div class="col-sm-8">@Model.Note</div>
-                        </div>
-                    }
-                    <div class="row mb-2">
-                        <div class="col-sm-4 text-muted">Trạng thái:</div>
-                        <div class="col-sm-8">
-                            <span class="badge bg-warning text-dark">Chờ xác nhận</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        /* Success animation */
+        .success-hero {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+        }
+        .success-check {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 35px rgba(34,197,94,0.3);
+            animation: popIn 0.6s ease-out;
+        }
+        .success-check i {
+            font-size: 2.8rem;
+            color: #fff;
+        }
+        @@keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-hero h2 {
+            font-weight: 800;
+            color: #22c55e;
+            margin-bottom: 0.5rem;
+        }
+        .success-hero p {
+            color: #666;
+            font-size: 1.05rem;
+        }
+        .order-number-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.3rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 12px;
+            margin-top: 0.75rem;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.25);
+        }
 
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="fas fa-box me-2"></i>Chi tiết sản phẩm</h5>
+        /* Timeline */
+        .order-timeline {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin: 2rem 0 2.5rem;
+            padding: 0 1rem;
+        }
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+            max-width: 160px;
+        }
+        .timeline-step .step-dot {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+        .timeline-step .step-dot.active {
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+        }
+        .timeline-step .step-dot.done {
+            background: #22c55e;
+            color: #fff;
+        }
+        .timeline-step .step-dot.pending {
+            background: #e8e8e8;
+            color: #999;
+        }
+        .timeline-step .step-label {
+            margin-top: 0.5rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #666;
+            text-align: center;
+        }
+        .timeline-step .step-label.active-label {
+            color: #FF6B35;
+        }
+        .timeline-connector {
+            flex: 1;
+            height: 3px;
+            background: #e8e8e8;
+            align-self: flex-start;
+            margin-top: 20px;
+            max-width: 80px;
+        }
+        .timeline-connector.done {
+            background: #22c55e;
+        }
+
+        /* Info Card */
+        .info-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+        }
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+        .info-card-header .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        .info-card-header h5 {
+            margin: 0;
+            font-weight: 700;
+            color: #1a1a2e;
+            font-size: 1.05rem;
+        }
+        .info-card-body {
+            padding: 1.25rem 1.5rem;
+        }
+        .info-row {
+            display: flex;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f8f8f8;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-row .info-label {
+            width: 180px;
+            flex-shrink: 0;
+            color: #888;
+            font-size: 0.92rem;
+        }
+        .info-row .info-value {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Product details table */
+        .product-table {
+            width: 100%;
+        }
+        .product-table thead {
+            background: #f8f9fa;
+        }
+        .product-table th {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #666;
+            border-bottom: 1px solid #eee;
+        }
+        .product-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 0.92rem;
+        }
+        .product-table tfoot td {
+            border-top: 2px solid #eee;
+            border-bottom: none;
+        }
+
+        /* CTA Buttons */
+        .cta-btn-primary {
+            background: linear-gradient(135deg, #FF6B35, #e55a26);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cta-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,107,53,0.35);
+            color: #fff;
+        }
+        .cta-btn-outline {
+            border: 2px solid #FF6B35;
+            color: #FF6B35;
+            border-radius: 12px;
+            padding: 0.7rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .cta-btn-outline:hover {
+            background: #FF6B35;
+            color: #fff;
+        }
+
+        @@media (max-width: 575.98px) {
+            .info-row {
+                flex-direction: column;
+            }
+            .info-row .info-label {
+                width: 100%;
+                margin-bottom: 0.2rem;
+            }
+            .timeline-step .step-label {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+}
+
+<section class="confirmation-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+
+                <!-- Success Hero -->
+                <div class="success-hero" data-aos="fade-down">
+                    <div class="success-check">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h2>Đặt hàng thành công!</h2>
+                    <p>Cảm ơn bạn đã mua hàng tại PhuKien247</p>
+                    <div class="order-number-badge">
+                        Đơn hàng #@Model.Id
+                    </div>
                 </div>
-                <div class="card-body p-0">
+
+                <!-- Timeline -->
+                <div class="order-timeline" data-aos="fade-up" data-aos-delay="200">
+                    <div class="timeline-step">
+                        <div class="step-dot done"><i class="fas fa-shopping-cart" style="font-size:0.85rem;"></i></div>
+                        <span class="step-label">Đặt hàng</span>
+                    </div>
+                    <div class="timeline-connector done"></div>
+                    <div class="timeline-step">
+                        <div class="step-dot active"><i class="fas fa-clock" style="font-size:0.85rem;"></i></div>
+                        <span class="step-label active-label">Chờ xác nhận</span>
+                    </div>
+                    <div class="timeline-connector"></div>
+                    <div class="timeline-step">
+                        <div class="step-dot pending"><i class="fas fa-box" style="font-size:0.85rem;"></i></div>
+                        <span class="step-label">Đang giao</span>
+                    </div>
+                    <div class="timeline-connector"></div>
+                    <div class="timeline-step">
+                        <div class="step-dot pending"><i class="fas fa-check-circle" style="font-size:0.85rem;"></i></div>
+                        <span class="step-label">Hoàn thành</span>
+                    </div>
+                </div>
+
+                <!-- Order Info -->
+                <div class="info-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="info-card-header">
+                        <span class="card-icon"><i class="fas fa-info-circle"></i></span>
+                        <h5>Thông tin đơn hàng</h5>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-hashtag me-2" style="color:#FF6B35;"></i>Mã đơn hàng</span>
+                            <span class="info-value fw-bold">#@Model.Id</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-calendar me-2" style="color:#FF6B35;"></i>Ngày đặt</span>
+                            <span class="info-value">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-map-marker-alt me-2" style="color:#FF6B35;"></i>Địa chỉ giao hàng</span>
+                            <span class="info-value">@Model.ShippingAddress</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-phone me-2" style="color:#FF6B35;"></i>Số điện thoại</span>
+                            <span class="info-value">@Model.PhoneNumber</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-wallet me-2" style="color:#FF6B35;"></i>Thanh toán</span>
+                            <span class="info-value">
+                                @if (Model.PaymentMethod == PhuKien247.Models.PaymentMethod.COD)
+                                {
+                                    <span class="badge" style="background:#ecfdf5; color:#16a34a; font-weight:600; padding:0.35rem 0.75rem; border-radius:8px;">
+                                        <i class="fas fa-money-bill-wave me-1"></i>COD - Thanh toán khi nhận hàng
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge" style="background:#eff6ff; color:#3b82f6; font-weight:600; padding:0.35rem 0.75rem; border-radius:8px;">
+                                        <i class="fas fa-university me-1"></i>Chuyển khoản ngân hàng
+                                    </span>
+                                }
+                            </span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Note))
+                        {
+                            <div class="info-row">
+                                <span class="info-label"><i class="fas fa-sticky-note me-2" style="color:#FF6B35;"></i>Ghi chú</span>
+                                <span class="info-value">@Model.Note</span>
+                            </div>
+                        }
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-flag me-2" style="color:#FF6B35;"></i>Trạng thái</span>
+                            <span class="info-value">
+                                <span class="badge" style="background:#fef3c7; color:#b45309; font-weight:600; padding:0.35rem 0.75rem; border-radius:8px;">
+                                    <i class="fas fa-clock me-1"></i>Chờ xác nhận
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="info-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="info-card-header">
+                        <span class="card-icon"><i class="fas fa-box"></i></span>
+                        <h5>Chi tiết sản phẩm</h5>
+                    </div>
                     <div class="table-responsive">
-                        <table class="table mb-0">
-                            <thead class="table-light">
+                        <table class="product-table">
+                            <thead>
                                 <tr>
                                     <th>Sản phẩm</th>
                                     <th class="text-center">Số lượng</th>
@@ -82,32 +367,39 @@
                                 @foreach (var detail in Model.OrderDetails)
                                 {
                                     <tr>
-                                        <td>@detail.Product.Name</td>
+                                        <td class="fw-medium">@detail.Product.Name</td>
                                         <td class="text-center">@detail.Quantity</td>
                                         <td class="text-end">@detail.UnitPrice.ToString("N0") đ</td>
-                                        <td class="text-end fw-bold">@((detail.UnitPrice * detail.Quantity).ToString("N0")) đ</td>
+                                        <td class="text-end fw-bold" style="color:#FF6B35;">@((detail.UnitPrice * detail.Quantity).ToString("N0")) đ</td>
                                     </tr>
                                 }
                             </tbody>
-                            <tfoot class="table-light">
+                            <tfoot>
                                 <tr>
-                                    <td colspan="3" class="text-end fw-bold">Tổng cộng:</td>
-                                    <td class="text-end fw-bold text-danger fs-5">@Model.TotalAmount.ToString("N0") đ</td>
+                                    <td colspan="3" class="text-end fw-bold" style="font-size:1.05rem;">Tổng cộng:</td>
+                                    <td class="text-end fw-bold" style="font-size:1.25rem; color:#FF6B35;">@Model.TotalAmount.ToString("N0") đ</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <div class="d-flex justify-content-center gap-3">
-                <a asp-controller="Product" asp-action="Index" class="btn btn-pk">
-                    <i class="fas fa-shopping-bag me-1"></i>Tiếp tục mua sắm
-                </a>
-                <a asp-controller="Order" asp-action="History" class="btn btn-pk-outline">
-                    <i class="fas fa-clipboard-list me-1"></i>Xem lịch sử đơn hàng
-                </a>
+                <!-- CTA Buttons -->
+                <div class="d-flex justify-content-center gap-3 flex-wrap mt-4" data-aos="fade-up" data-aos-delay="500">
+                    <a asp-controller="Product" asp-action="Index" class="btn cta-btn-primary">
+                        <i class="fas fa-shopping-bag me-2"></i>Tiếp tục mua sắm
+                    </a>
+                    <a asp-controller="Order" asp-action="History" class="btn cta-btn-outline">
+                        <i class="fas fa-clipboard-list me-2"></i>Xem lịch sử đơn hàng
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>AOS.init({ once: true });</script>
+}

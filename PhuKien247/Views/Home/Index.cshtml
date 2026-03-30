@@ -3,382 +3,1163 @@
 
     var featuredProducts = ViewBag.FeaturedProducts as List<Product> ?? new List<Product>();
     var repairServices = ViewBag.RepairServices as List<RepairService> ?? new List<RepairService>();
+    var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+
+    // Category icon mapping
+    var categoryIcons = new Dictionary<string, string>
+    {
+        { "default", "fas fa-th-large" },
+        { "ốp lưng", "fas fa-shield-alt" },
+        { "case", "fas fa-shield-alt" },
+        { "sạc", "fas fa-bolt" },
+        { "charger", "fas fa-bolt" },
+        { "tai nghe", "fas fa-headphones" },
+        { "headphone", "fas fa-headphones" },
+        { "cáp", "fas fa-plug" },
+        { "cable", "fas fa-plug" },
+        { "pin", "fas fa-battery-full" },
+        { "battery", "fas fa-battery-full" },
+        { "kính", "fas fa-mobile-screen" },
+        { "screen", "fas fa-mobile-screen" },
+        { "loa", "fas fa-volume-up" },
+        { "speaker", "fas fa-volume-up" },
+        { "phụ kiện", "fas fa-puzzle-piece" },
+        { "accessory", "fas fa-puzzle-piece" },
+        { "bàn phím", "fas fa-keyboard" },
+        { "chuột", "fas fa-computer-mouse" },
+        { "đồng hồ", "fas fa-clock" },
+        { "watch", "fas fa-clock" },
+    };
+
+    string GetCategoryIcon(string categoryName)
+    {
+        if (string.IsNullOrEmpty(categoryName)) return categoryIcons["default"];
+        var lower = categoryName.ToLower();
+        foreach (var kvp in categoryIcons)
+        {
+            if (kvp.Key != "default" && lower.Contains(kvp.Key))
+                return kvp.Value;
+        }
+        return categoryIcons["default"];
+    }
+
+    // Category color palette
+    var categoryColors = new[] {
+        "linear-gradient(135deg, #FF6B35, #ff8f65)",
+        "linear-gradient(135deg, #6C63FF, #8b85ff)",
+        "linear-gradient(135deg, #00C9A7, #33d6bc)",
+        "linear-gradient(135deg, #FF5E78, #ff8a9b)",
+        "linear-gradient(135deg, #FFB347, #ffc870)",
+        "linear-gradient(135deg, #4ECDC4, #7eddd6)",
+        "linear-gradient(135deg, #A855F7, #c084fc)",
+        "linear-gradient(135deg, #3B82F6, #60a5fa)",
+    };
 }
 
 @section Styles {
 <style>
-    /* Hero Section */
-    .hero-section {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        color: #fff;
-        padding: 5rem 0;
+    /* ============================================
+       HERO SWIPER
+       ============================================ */
+    .hero-swiper {
+        width: 100%;
+        height: 85vh;
+        min-height: 500px;
+        max-height: 750px;
+    }
+
+    .hero-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
         overflow: hidden;
     }
 
-    .hero-section::before {
+    .hero-slide-1 {
+        background: linear-gradient(135deg, #FF6B35 0%, #ff8f65 40%, #ffd4c0 100%);
+    }
+
+    .hero-slide-2 {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    .hero-slide-3 {
+        background: linear-gradient(135deg, #6C63FF 0%, #8b85ff 50%, #b8b4ff 100%);
+    }
+
+    .hero-slide::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -20%;
+        top: -30%;
+        right: -10%;
         width: 600px;
         height: 600px;
-        background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
         border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
     }
 
-    .hero-section h1 {
-        font-size: 2.8rem;
-        font-weight: 800;
-        line-height: 1.2;
-    }
-
-    .hero-section .highlight {
-        color: var(--pk-orange);
-    }
-
-    .hero-section p.lead {
-        font-size: 1.15rem;
-        color: #bbb;
-        margin-top: 1rem;
-    }
-
-    .hero-stats {
-        display: flex;
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-
-    .hero-stats .stat h3 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--pk-orange);
-        margin-bottom: 0;
-    }
-
-    .hero-stats .stat p {
-        margin-bottom: 0;
-        color: #aaa;
-        font-size: 0.9rem;
-    }
-
-    /* Section titles */
-    .section-title {
-        font-weight: 700;
-        position: relative;
-        display: inline-block;
-        margin-bottom: 0.5rem;
-    }
-
-    .section-title::after {
+    .hero-slide::after {
         content: '';
-        display: block;
-        width: 60px;
-        height: 4px;
-        background-color: var(--pk-orange);
-        margin-top: 8px;
-        border-radius: 2px;
-    }
-
-    .section-title.text-center::after {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* Product cards */
-    .product-card {
-        border: none;
-        border-radius: 12px;
-        overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-
-    .product-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    }
-
-    .product-card .card-img-top {
-        height: 200px;
-        object-fit: cover;
-        background-color: #f5f5f5;
-    }
-
-    .product-card .badge-sale {
         position: absolute;
-        top: 12px;
-        left: 12px;
-        background-color: #dc3545;
-        color: #fff;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        bottom: -20%;
+        left: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite reverse;
     }
 
-    .product-card .price-current {
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: #fff;
+        max-width: 700px;
+        padding: 0 2rem;
+    }
+
+    .hero-content .hero-badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .hero-content h1 {
+        font-size: 3.2rem;
+        font-weight: 800;
+        line-height: 1.15;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    }
+
+    .hero-content p {
+        font-size: 1.15rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .hero-content .btn {
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        border-radius: 50px;
+        transition: var(--pk-transition);
+    }
+
+    .hero-content .btn-light {
+        color: var(--pk-orange);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .hero-content .btn-light:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .hero-content .btn-outline-light {
+        border-width: 2px;
+    }
+
+    .hero-content .btn-outline-light:hover {
+        transform: translateY(-3px);
+        background: rgba(255,255,255,0.15);
+    }
+
+    .hero-swiper .swiper-pagination-bullet {
+        width: 12px;
+        height: 12px;
+        background: rgba(255,255,255,0.5);
+        opacity: 1;
+        transition: all 0.3s ease;
+    }
+
+    .hero-swiper .swiper-pagination-bullet-active {
+        background: #fff;
+        width: 36px;
+        border-radius: 6px;
+    }
+
+    .hero-swiper .swiper-button-next,
+    .hero-swiper .swiper-button-prev {
+        color: #fff;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        transition: var(--pk-transition);
+    }
+
+    .hero-swiper .swiper-button-next:hover,
+    .hero-swiper .swiper-button-prev:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    .hero-swiper .swiper-button-next::after,
+    .hero-swiper .swiper-button-prev::after {
         font-size: 1.1rem;
         font-weight: 700;
-        color: var(--pk-orange);
     }
 
-    .product-card .price-original {
-        font-size: 0.85rem;
-        text-decoration: line-through;
-        color: #999;
+    /* Parallax effect on content */
+    .hero-content [data-swiper-parallax] {
+        transition: none;
     }
 
-    /* Service cards */
-    .service-card {
-        border: none;
-        border-radius: 12px;
-        overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    @@media (max-width: 767.98px) {
+        .hero-swiper {
+            height: 70vh;
+            min-height: 400px;
+        }
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+        .hero-content p {
+            font-size: 0.95rem;
+        }
+        .hero-swiper .swiper-button-next,
+        .hero-swiper .swiper-button-prev {
+            display: none;
+        }
     }
 
-    .service-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    /* ============================================
+       CATEGORY SECTION
+       ============================================ */
+    .category-section {
+        padding: 4rem 0;
+        background: #fff;
     }
 
-    .service-card .card-img-top {
-        height: 180px;
-        object-fit: cover;
-        background-color: #f5f5f5;
+    .category-scroll {
+        display: flex;
+        gap: 1.2rem;
+        overflow-x: auto;
+        padding: 1rem 0.5rem 1.5rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
-    .service-card .service-price {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--pk-orange);
+    .category-scroll::-webkit-scrollbar {
+        display: none;
     }
 
-    .service-card .service-time {
-        font-size: 0.85rem;
-        color: #888;
-    }
-
-    /* Why choose us */
-    .feature-box {
+    .category-card {
+        flex: 0 0 auto;
+        width: 130px;
         text-align: center;
-        padding: 2rem 1.5rem;
-        border-radius: 12px;
+        padding: 1.5rem 1rem;
+        border-radius: 16px;
         background: #fff;
         box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        transition: var(--pk-transition);
+        text-decoration: none;
+        color: var(--pk-dark);
+        border: 2px solid transparent;
     }
 
-    .feature-box:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    .category-card:hover {
+        transform: translateY(-6px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        color: var(--pk-dark);
     }
 
-    .feature-box .icon-circle {
-        width: 70px;
-        height: 70px;
-        background: linear-gradient(135deg, var(--pk-orange), #ff8f5e);
+    .category-card .cat-icon {
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        font-size: 1.4rem;
+        color: #fff;
+        transition: var(--pk-transition);
+    }
+
+    .category-card:hover .cat-icon {
+        transform: scale(1.15) rotate(5deg);
+    }
+
+    .category-card .cat-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    /* ============================================
+       SECTION TITLES
+       ============================================ */
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .section-header .section-tag {
+        display: inline-block;
+        background: rgba(255, 107, 53, 0.1);
+        color: var(--pk-orange);
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.8rem;
+    }
+
+    .section-header h2 {
+        font-weight: 800;
+        font-size: 2.2rem;
+        color: var(--pk-dark);
+        margin-bottom: 0.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-header h2::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: var(--pk-gradient);
+        margin: 12px auto 0;
+        border-radius: 2px;
+        animation: expandLine 1.5s ease-in-out infinite alternate;
+    }
+
+    @@keyframes expandLine {
+        from { width: 40px; }
+        to { width: 80px; }
+    }
+
+    .section-header p {
+        color: #777;
+        font-size: 1.05rem;
+        max-width: 500px;
+        margin: 0.5rem auto 0;
+    }
+
+    /* ============================================
+       FEATURED PRODUCTS SWIPER
+       ============================================ */
+    .products-swiper {
+        padding: 1rem 0 3rem;
+    }
+
+    .products-swiper .swiper-pagination-bullet-active {
+        background: var(--pk-orange);
+    }
+
+    .product-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        transition: var(--pk-transition);
+        background: #fff;
+        height: 100%;
+    }
+
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.14);
+    }
+
+    .product-img-wrap {
+        position: relative;
+        overflow: hidden;
+        height: 220px;
+        background: #f8f9fa;
+    }
+
+    .product-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .product-card:hover .product-img-wrap img {
+        transform: scale(1.1);
+    }
+
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(26, 26, 46, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+
+    .product-overlay .btn {
+        transform: translateY(15px);
+        opacity: 0;
+        transition: all 0.3s ease 0.1s;
+    }
+
+    .product-card:hover .product-overlay .btn {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .badge-sale {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: linear-gradient(135deg, #dc3545, #ff6b7a);
+        color: #fff;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        z-index: 2;
+        animation: salePulse 2s ease-in-out infinite;
+    }
+
+    @@keyframes salePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+        50% { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+    }
+
+    .product-card .card-body {
+        padding: 1.2rem;
+    }
+
+    .product-card .product-category {
+        font-size: 0.75rem;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .product-card .card-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin: 0.4rem 0;
+        color: var(--pk-dark);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .price-current {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--pk-orange);
+    }
+
+    .price-original {
+        font-size: 0.85rem;
+        text-decoration: line-through;
+        color: #aaa;
+    }
+
+    .btn-add-cart {
+        width: 100%;
+        border: none;
+        background: var(--pk-gradient);
+        color: #fff;
+        padding: 0.55rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: var(--pk-transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-add-cart:hover {
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        transform: translateY(-2px);
+    }
+
+    /* ============================================
+       REPAIR SERVICES
+       ============================================ */
+    .service-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        transition: var(--pk-transition);
+        position: relative;
+        background: #fff;
+    }
+
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.14);
+    }
+
+    .service-img-wrap {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+    }
+
+    .service-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+        opacity: 0.8;
+    }
+
+    .service-card:hover .service-img-wrap img {
+        transform: scale(1.08);
+    }
+
+    .service-icon-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 107, 53, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.5rem;
+        transition: var(--pk-transition);
+        z-index: 2;
+    }
+
+    .service-card:hover .service-icon-overlay {
+        transform: translate(-50%, -50%) scale(1.15) rotate(10deg);
+        box-shadow: 0 8px 25px rgba(255, 107, 53, 0.5);
+    }
+
+    .service-card .card-body {
+        padding: 1.3rem;
+    }
+
+    .service-price-badge {
+        display: inline-block;
+        background: rgba(255, 107, 53, 0.1);
+        color: var(--pk-orange);
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .service-time-badge {
+        display: inline-block;
+        background: rgba(0,0,0,0.05);
+        color: #666;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* ============================================
+       WHY CHOOSE US
+       ============================================ */
+    .feature-box {
+        text-align: center;
+        padding: 2.5rem 1.5rem;
+        border-radius: 20px;
+        background: #fff;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        transition: var(--pk-transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-box::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at center, rgba(255,107,53,0.04) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .feature-box:hover::before {
+        opacity: 1;
+    }
+
+    .feature-box:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    .feature-box .icon-circle {
+        width: 80px;
+        height: 80px;
+        background: var(--pk-gradient);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.2rem;
+        transition: var(--pk-transition);
+    }
+
+    .feature-box:hover .icon-circle {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
     }
 
     .feature-box .icon-circle i {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
         color: #fff;
     }
 
     .feature-box h5 {
         font-weight: 700;
         margin-bottom: 0.5rem;
+        font-size: 1.1rem;
     }
 
     .feature-box p {
         color: #777;
         font-size: 0.9rem;
         margin-bottom: 0;
+        line-height: 1.6;
     }
 
+    /* Counter animation */
+    .stat-counter {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--pk-orange);
+        line-height: 1;
+        margin-bottom: 0.3rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #777;
+        font-weight: 500;
+    }
+
+    /* ============================================
+       TESTIMONIALS
+       ============================================ */
+    .testimonial-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #eef1f5 100%);
+    }
+
+    .testimonials-swiper {
+        padding: 1rem 0 3.5rem;
+    }
+
+    .testimonials-swiper .swiper-pagination-bullet-active {
+        background: var(--pk-orange);
+    }
+
+    .testimonial-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        transition: var(--pk-transition);
+        position: relative;
+        height: 100%;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+    }
+
+    .testimonial-card .quote-icon {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        font-size: 2.5rem;
+        color: rgba(255, 107, 53, 0.1);
+    }
+
+    .testimonial-avatar {
+        width: 60px;
+        height: 60px;
+        background: var(--pk-gradient);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .testimonial-stars {
+        color: #FFB347;
+        font-size: 0.9rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .testimonial-text {
+        font-style: italic;
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .testimonial-author {
+        font-weight: 700;
+        color: var(--pk-dark);
+        margin-bottom: 0.1rem;
+    }
+
+    .testimonial-role {
+        font-size: 0.8rem;
+        color: #999;
+    }
+
+    /* ============================================
+       CTA BANNER
+       ============================================ */
+    .cta-banner {
+        background: linear-gradient(135deg, #FF6B35 0%, #ff8f65 50%, #ffd4c0 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 5rem 0;
+    }
+
+    .cta-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite;
+    }
+
+    .cta-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite reverse;
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: #fff;
+    }
+
+    .cta-content h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin-bottom: 2rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cta-email-form {
+        max-width: 480px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .cta-email-form input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        padding-right: 140px;
+        border: 2px solid rgba(255,255,255,0.4);
+        border-radius: 50px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        color: #fff;
+        font-size: 1rem;
+        transition: var(--pk-transition);
+    }
+
+    .cta-email-form input::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+
+    .cta-email-form input:focus {
+        outline: none;
+        border-color: #fff;
+        background: rgba(255,255,255,0.25);
+    }
+
+    .cta-email-form button {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        bottom: 5px;
+        border: none;
+        background: #fff;
+        color: var(--pk-orange);
+        border-radius: 50px;
+        padding: 0 1.8rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        transition: var(--pk-transition);
+        cursor: pointer;
+    }
+
+    .cta-email-form button:hover {
+        background: var(--pk-dark);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* ============================================
+       LIGHT BACKGROUND SECTION
+       ============================================ */
     .bg-light-section {
-        background-color: #f8f9fa;
+        background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
+    }
+
+    .bg-white-section {
+        background: #fff;
+    }
+
+    /* ============================================
+       RESPONSIVE TWEAKS
+       ============================================ */
+    @@media (max-width: 767.98px) {
+        .cta-content h2 {
+            font-size: 1.8rem;
+        }
+        .stat-counter {
+            font-size: 2rem;
+        }
+        .section-header h2 {
+            font-size: 1.7rem;
+        }
     }
 </style>
 }
 
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h1>
-                    Ph&#7909; ki&#7879;n &#273;i&#7879;n tho&#7841;i<br />
-                    <span class="highlight">ch&#7845;t l&#432;&#7907;ng cao</span> &amp;<br />
-                    d&#7883;ch v&#7909; s&#7917;a ch&#7919;a <span class="highlight">uy t&iacute;n</span>
-                </h1>
-                <p class="lead">
-                    PhuKien247 - &#272;&#7883;a ch&#7881; tin c&#7853;y cho m&#7885;i nhu c&#7847;u v&#7873; ph&#7909; ki&#7879;n v&agrave; s&#7917;a ch&#7919;a &#273;i&#7879;n tho&#7841;i.
-                    S&#7843;n ph&#7849;m ch&iacute;nh h&atilde;ng, gi&aacute; t&#7889;t, b&#7843;o h&agrave;nh d&agrave;i h&#7841;n.
-                </p>
-                <div class="mt-4">
-                    <a asp-controller="Product" asp-action="Index" class="btn btn-pk btn-lg me-2">
+<!-- ============================================
+     HERO SWIPER SLIDER
+     ============================================ -->
+<section class="hero-swiper swiper" id="heroSwiper">
+    <div class="swiper-wrapper">
+        <!-- Slide 1 -->
+        <div class="swiper-slide hero-slide hero-slide-1">
+            <div class="hero-content">
+                <div data-swiper-parallax="-100">
+                    <span class="hero-badge"><i class="fas fa-star me-1"></i>S&#7889; 1 Vi&#7879;t Nam</span>
+                </div>
+                <h1 data-swiper-parallax="-200">Ph&#7909; ki&#7879;n ch&iacute;nh h&atilde;ng<br/>Gi&aacute; t&#7889;t nh&#7845;t</h1>
+                <p data-swiper-parallax="-300">Hàng nghìn sản phẩm phụ kiện điện thoại chính hãng với mức giá cạnh tranh nhất thị trường. Miễn phí vận chuyển cho đơn từ 500K.</p>
+                <div data-swiper-parallax="-400">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-light btn-lg me-2">
                         <i class="fas fa-shopping-bag me-2"></i>Mua s&#7855;m ngay
                     </a>
                     <a asp-controller="RepairService" asp-action="Index" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-tools me-2"></i>&#272;&#7863;t l&#7883;ch s&#7917;a ch&#7919;a
+                        <i class="fas fa-tools me-2"></i>D&#7883;ch v&#7909;
                     </a>
                 </div>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <h3>10K+</h3>
-                        <p>S&#7843;n ph&#7849;m</p>
-                    </div>
-                    <div class="stat">
-                        <h3>50K+</h3>
-                        <p>Kh&aacute;ch h&agrave;ng</p>
-                    </div>
-                    <div class="stat">
-                        <h3>99%</h3>
-                        <p>H&agrave;i l&ograve;ng</p>
-                    </div>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="swiper-slide hero-slide hero-slide-2">
+            <div class="hero-content">
+                <div data-swiper-parallax="-100">
+                    <span class="hero-badge"><i class="fas fa-wrench me-1"></i>Chuy&ecirc;n nghi&#7879;p</span>
+                </div>
+                <h1 data-swiper-parallax="-200">D&#7883;ch v&#7909; s&#7917;a ch&#7919;a<br/>chuy&ecirc;n nghi&#7879;p</h1>
+                <p data-swiper-parallax="-300">Đội ngũ kỹ thuật viên tay nghề cao, sửa chữa nhanh chóng với linh kiện chính hãng. Bảo hành dài hạn cho mọi dịch vụ.</p>
+                <div data-swiper-parallax="-400">
+                    <a asp-controller="RepairService" asp-action="Index" class="btn btn-light btn-lg me-2">
+                        <i class="fas fa-calendar-check me-2"></i>&#272;&#7863;t l&#7883;ch ngay
+                    </a>
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-box-open me-2"></i>Xem s&#7843;n ph&#7849;m
+                    </a>
                 </div>
             </div>
-            <div class="col-lg-5 text-center mt-4 mt-lg-0">
-                <img src="https://images.unsplash.com/photo-1556656793-08538906a9f8?w=500&h=500&fit=crop"
-                     alt="Phone accessories" class="img-fluid rounded-4 shadow" style="max-height: 420px;" />
+        </div>
+        <!-- Slide 3 -->
+        <div class="swiper-slide hero-slide hero-slide-3">
+            <div class="hero-content">
+                <div data-swiper-parallax="-100">
+                    <span class="hero-badge"><i class="fas fa-fire me-1"></i>Hot Deal</span>
+                </div>
+                <h1 data-swiper-parallax="-200">Khuy&#7871;n m&atilde;i<br/>l&ecirc;n &#273;&#7871;n 50%</h1>
+                <p data-swiper-parallax="-300">Chương trình ưu đãi đặc biệt cho tất cả sản phẩm và dịch vụ. Nhanh tay đặt hàng trước khi hết khuyến mãi!</p>
+                <div data-swiper-parallax="-400">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-light btn-lg me-2">
+                        <i class="fas fa-tags me-2"></i>Xem khuy&#7871;n m&atilde;i
+                    </a>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-phone me-2"></i>Li&ecirc;n h&#7879;
+                    </a>
+                </div>
             </div>
+        </div>
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</section>
+
+<!-- ============================================
+     CATEGORY SECTION
+     ============================================ -->
+<section class="category-section" data-aos="fade-up">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Danh m&#7909;c</span>
+            <h2>Kh&aacute;m ph&aacute; theo danh m&#7909;c</h2>
+            <p>T&igrave;m ki&#7871;m s&#7843;n ph&#7849;m theo danh m&#7909;c y&ecirc;u th&iacute;ch c&#7911;a b&#7841;n</p>
+        </div>
+        <div class="category-scroll">
+            @if (categories.Any())
+            {
+                var colorIndex = 0;
+                foreach (var cat in categories)
+                {
+                    var color = categoryColors[colorIndex % categoryColors.Length];
+                    var icon = GetCategoryIcon(cat.Name);
+                    <a asp-controller="Product" asp-action="Index" asp-route-category="@cat.Id" class="category-card" data-aos="zoom-in" data-aos-delay="@(colorIndex * 80)">
+                        <div class="cat-icon" style="background: @color;">
+                            <i class="@icon"></i>
+                        </div>
+                        <p class="cat-name">@cat.Name</p>
+                    </a>
+                    colorIndex++;
+                }
+            }
+            else
+            {
+                <!-- Fallback categories -->
+                <div class="category-card" data-aos="zoom-in" data-aos-delay="0">
+                    <div class="cat-icon" style="background: linear-gradient(135deg, #FF6B35, #ff8f65);"><i class="fas fa-shield-alt"></i></div>
+                    <p class="cat-name">&#7888;p l&#432;ng</p>
+                </div>
+                <div class="category-card" data-aos="zoom-in" data-aos-delay="80">
+                    <div class="cat-icon" style="background: linear-gradient(135deg, #6C63FF, #8b85ff);"><i class="fas fa-bolt"></i></div>
+                    <p class="cat-name">S&#7841;c</p>
+                </div>
+                <div class="category-card" data-aos="zoom-in" data-aos-delay="160">
+                    <div class="cat-icon" style="background: linear-gradient(135deg, #00C9A7, #33d6bc);"><i class="fas fa-headphones"></i></div>
+                    <p class="cat-name">Tai nghe</p>
+                </div>
+                <div class="category-card" data-aos="zoom-in" data-aos-delay="240">
+                    <div class="cat-icon" style="background: linear-gradient(135deg, #FF5E78, #ff8a9b);"><i class="fas fa-plug"></i></div>
+                    <p class="cat-name">C&aacute;p</p>
+                </div>
+                <div class="category-card" data-aos="zoom-in" data-aos-delay="320">
+                    <div class="cat-icon" style="background: linear-gradient(135deg, #FFB347, #ffc870);"><i class="fas fa-battery-full"></i></div>
+                    <p class="cat-name">Pin d&#7921; ph&ograve;ng</p>
+                </div>
+                <div class="category-card" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="cat-icon" style="background: linear-gradient(135deg, #4ECDC4, #7eddd6);"><i class="fas fa-mobile-screen"></i></div>
+                    <p class="cat-name">K&iacute;nh c&#432;&#7901;ng l&#7921;c</p>
+                </div>
+            }
         </div>
     </div>
 </section>
 
-<!-- Featured Products -->
-<section class="py-5">
+<!-- ============================================
+     FEATURED PRODUCTS
+     ============================================ -->
+<section class="py-5 bg-light-section">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title text-center">S&#7843;n ph&#7849;m n&#7893;i b&#7853;t</h2>
-            <p class="text-muted">Nh&#7919;ng s&#7843;n ph&#7849;m &#273;&#432;&#7907;c y&ecirc;u th&iacute;ch nh&#7845;t t&#7841;i PhuKien247</p>
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fas fa-fire me-1"></i>N&#7893;i b&#7853;t</span>
+            <h2>S&#7843;n ph&#7849;m n&#7893;i b&#7853;t</h2>
+            <p>Nh&#7919;ng s&#7843;n ph&#7849;m &#273;&#432;&#7907;c y&ecirc;u th&iacute;ch nh&#7845;t t&#7841;i PhuKien247</p>
         </div>
 
         @if (featuredProducts.Any())
         {
-            <div class="row g-4">
-                @foreach (var product in featuredProducts)
-                {
-                    <div class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="card product-card h-100 position-relative">
-                            @if (product.SalePrice.HasValue && product.SalePrice < product.Price)
-                            {
-                                var discount = Math.Round((1 - product.SalePrice.Value / product.Price) * 100);
-                                <span class="badge-sale">-@discount%</span>
-                            }
-                            <img src="@(product.ImageUrl ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23adb5bd' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E")"
-                                 class="card-img-top" alt="@product.Name" />
-                            <div class="card-body d-flex flex-column">
-                                <small class="text-muted mb-1">@product.Category?.Name &bull; @product.Brand?.Name</small>
-                                <h6 class="card-title fw-bold">@product.Name</h6>
-                                <div class="mt-auto">
+            <div class="swiper products-swiper" id="productsSwiper" data-aos="fade-up" data-aos-delay="200">
+                <div class="swiper-wrapper">
+                    @foreach (var product in featuredProducts)
+                    {
+                        <div class="swiper-slide" style="height: auto;">
+                            <div class="product-card h-100">
+                                <div class="product-img-wrap">
                                     @if (product.SalePrice.HasValue && product.SalePrice < product.Price)
                                     {
-                                        <span class="price-current">@product.SalePrice.Value.ToString("N0")&#273;</span>
-                                        <span class="price-original ms-2">@product.Price.ToString("N0")&#273;</span>
+                                        var discount = Math.Round((1 - product.SalePrice.Value / product.Price) * 100);
+                                        <span class="badge-sale"><i class="fas fa-tag me-1"></i>-@discount%</span>
                                     }
-                                    else
-                                    {
-                                        <span class="price-current">@product.Price.ToString("N0")&#273;</span>
-                                    }
+                                    <img src="@(product.ImageUrl ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='220'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f8f9fa'/%3E%3Cstop offset='100%25' style='stop-color:%23e9ecef'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='220' fill='url(%23g)'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23adb5bd' font-size='36'%3E%F0%9F%93%B1%3C/text%3E%3Ctext x='50%25' y='62%25' dominant-baseline='middle' text-anchor='middle' fill='%23adb5bd' font-size='12'%3ENo Image%3C/text%3E%3C/svg%3E")"
+                                         alt="@product.Name" loading="lazy" />
+                                    <div class="product-overlay">
+                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id"
+                                           class="btn btn-light btn-sm rounded-pill px-4">
+                                            <i class="fas fa-eye me-1"></i>Xem chi ti&#7871;t
+                                        </a>
+                                    </div>
                                 </div>
-                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id"
-                                   class="btn btn-sm btn-pk mt-2 w-100">
-                                    <i class="fas fa-eye me-1"></i>Xem chi ti&#7871;t
-                                </a>
+                                <div class="card-body d-flex flex-column">
+                                    <span class="product-category">@product.Category?.Name &bull; @product.Brand?.Name</span>
+                                    <h6 class="card-title">@product.Name</h6>
+                                    <div class="mt-auto">
+                                        <div class="mb-2">
+                                            @if (product.SalePrice.HasValue && product.SalePrice < product.Price)
+                                            {
+                                                <span class="price-current">@product.SalePrice.Value.ToString("N0")&#273;</span>
+                                                <span class="price-original ms-2">@product.Price.ToString("N0")&#273;</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="price-current">@product.Price.ToString("N0")&#273;</span>
+                                            }
+                                        </div>
+                                        <button class="btn-add-cart" onclick="window.location.href='@Url.Action("Details", "Product", new { id = product.Id })'">
+                                            <i class="fas fa-cart-plus me-1"></i>Th&ecirc;m v&agrave;o gi&#7887;
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
+                <div class="swiper-pagination"></div>
             </div>
-            <div class="text-center mt-4">
-                <a asp-controller="Product" asp-action="Index" class="btn btn-pk-outline btn-lg">
+            <div class="text-center mt-3" data-aos="fade-up" data-aos-delay="300">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-pk-outline btn-lg rounded-pill px-5">
                     Xem t&#7845;t c&#7843; s&#7843;n ph&#7849;m <i class="fas fa-arrow-right ms-2"></i>
                 </a>
             </div>
         }
         else
         {
-            <div class="text-center text-muted py-4">
-                <i class="fas fa-box-open fa-3x mb-3"></i>
-                <p>&#272;ang c&#7853;p nh&#7853;t s&#7843;n ph&#7849;m...</p>
+            <div class="text-center text-muted py-5" data-aos="fade-up">
+                <i class="fas fa-box-open fa-4x mb-3" style="color: #ddd;"></i>
+                <p class="fs-5">&#272;ang c&#7853;p nh&#7853;t s&#7843;n ph&#7849;m...</p>
             </div>
         }
     </div>
 </section>
 
-<!-- Repair Services -->
-<section class="py-5 bg-light-section">
+<!-- ============================================
+     REPAIR SERVICES
+     ============================================ -->
+<section class="py-5 bg-white-section">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title text-center">D&#7883;ch v&#7909; s&#7917;a ch&#7919;a</h2>
-            <p class="text-muted">&#272;&#7897;i ng&#361; k&#7929; thu&#7853;t vi&ecirc;n chuy&ecirc;n nghi&#7879;p, s&#7917;a ch&#7919;a nhanh ch&oacute;ng</p>
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fas fa-tools me-1"></i>D&#7883;ch v&#7909;</span>
+            <h2>D&#7883;ch v&#7909; s&#7917;a ch&#7919;a</h2>
+            <p>&#272;&#7897;i ng&#361; k&#7929; thu&#7853;t vi&ecirc;n chuy&ecirc;n nghi&#7879;p, s&#7917;a ch&#7919;a nhanh ch&oacute;ng</p>
         </div>
 
         @if (repairServices.Any())
         {
             <div class="row g-4">
+                @{ var serviceIndex = 0; }
                 @foreach (var service in repairServices)
                 {
-                    <div class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="card service-card h-100">
-                            <img src="@(service.ImageUrl ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Crect width='300' height='180' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23adb5bd' font-size='14'%3ERepair Service%3C/text%3E%3C/svg%3E")"
-                                 class="card-img-top" alt="@service.Name" />
+                    <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="@(serviceIndex * 100)">
+                        <div class="service-card h-100">
+                            <div class="service-img-wrap">
+                                <img src="@(service.ImageUrl ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231a1a2e'/%3E%3Cstop offset='100%25' style='stop-color:%2316213e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='200' fill='url(%23g)'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff44' font-size='40'%3E%F0%9F%94%A7%3C/text%3E%3Ctext x='50%25' y='65%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff44' font-size='11'%3ES%E1%BB%ADa ch%E1%BB%AFa%3C/text%3E%3C/svg%3E")"
+                                     alt="@service.Name" loading="lazy" />
+                                <div class="service-icon-overlay">
+                                    <i class="fas fa-wrench"></i>
+                                </div>
+                            </div>
                             <div class="card-body d-flex flex-column">
-                                <h6 class="card-title fw-bold">@service.Name</h6>
-                                <p class="card-text text-muted small flex-grow-1">
-                                    @(service.Description?.Length > 100 ? service.Description.Substring(0, 100) + "..." : service.Description)
+                                <h6 class="fw-bold mb-2">@service.Name</h6>
+                                <p class="text-muted small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    @(service.Description ?? "Dịch vụ sửa chữa chuyên nghiệp")
                                 </p>
-                                <div class="d-flex justify-content-between align-items-center mt-auto">
-                                    <span class="service-price">T&#7915; @service.Price.ToString("N0")&#273;</span>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="service-price-badge">
+                                        <i class="fas fa-tag me-1"></i>T&#7915; @service.Price.ToString("N0")&#273;
+                                    </span>
                                     @if (!string.IsNullOrEmpty(service.EstimatedTime))
                                     {
-                                        <span class="service-time">
+                                        <span class="service-time-badge">
                                             <i class="fas fa-clock me-1"></i>@service.EstimatedTime
                                         </span>
                                     }
                                 </div>
                                 <a asp-controller="RepairService" asp-action="Details" asp-route-id="@service.Id"
-                                   class="btn btn-sm btn-pk mt-2 w-100">
-                                    <i class="fas fa-calendar-check me-1"></i>&#272;&#7863;t l&#7883;ch
+                                   class="btn btn-pk btn-sm w-100 rounded-pill">
+                                    <i class="fas fa-calendar-check me-1"></i>&#272;&#7863;t l&#7883;ch ngay
                                 </a>
                             </div>
                         </div>
                     </div>
+                    serviceIndex++;
                 }
             </div>
-            <div class="text-center mt-4">
-                <a asp-controller="RepairService" asp-action="Index" class="btn btn-pk-outline btn-lg">
+            <div class="text-center mt-4" data-aos="fade-up">
+                <a asp-controller="RepairService" asp-action="Index" class="btn btn-pk-outline btn-lg rounded-pill px-5">
                     Xem t&#7845;t c&#7843; d&#7883;ch v&#7909; <i class="fas fa-arrow-right ms-2"></i>
                 </a>
             </div>
         }
         else
         {
-            <div class="text-center text-muted py-4">
-                <i class="fas fa-tools fa-3x mb-3"></i>
-                <p>&#272;ang c&#7853;p nh&#7853;t d&#7883;ch v&#7909;...</p>
+            <div class="text-center text-muted py-5" data-aos="fade-up">
+                <i class="fas fa-tools fa-4x mb-3" style="color: #ddd;"></i>
+                <p class="fs-5">&#272;ang c&#7853;p nh&#7853;t d&#7883;ch v&#7909;...</p>
             </div>
         }
     </div>
 </section>
 
-<!-- Why Choose Us -->
-<section class="py-5">
+<!-- ============================================
+     WHY CHOOSE US + STATS
+     ============================================ -->
+<section class="py-5 bg-light-section">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title text-center">T&#7841;i sao ch&#7885;n PhuKien247?</h2>
-            <p class="text-muted">Ch&uacute;ng t&ocirc;i lu&ocirc;n &#273;&#7863;t kh&aacute;ch h&agrave;ng l&ecirc;n h&agrave;ng &#273;&#7847;u</p>
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fas fa-award me-1"></i>Cam k&#7871;t</span>
+            <h2>T&#7841;i sao ch&#7885;n PhuKien247?</h2>
+            <p>Ch&uacute;ng t&ocirc;i lu&ocirc;n &#273;&#7863;t kh&aacute;ch h&agrave;ng l&ecirc;n h&agrave;ng &#273;&#7847;u</p>
         </div>
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
+
+        <!-- Feature cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="0">
                 <div class="feature-box h-100">
                     <div class="icon-circle">
                         <i class="fas fa-certificate"></i>
@@ -387,7 +1168,7 @@
                     <p>100% s&#7843;n ph&#7849;m ch&iacute;nh h&atilde;ng, ngu&#7891;n g&#7889;c r&otilde; r&agrave;ng, &#273;&#7847;y &#273;&#7911; gi&#7845;y t&#7901; ch&#7913;ng nh&#7853;n.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
                 <div class="feature-box h-100">
                     <div class="icon-circle">
                         <i class="fas fa-shipping-fast"></i>
@@ -396,7 +1177,7 @@
                     <p>Giao h&agrave;ng to&agrave;n qu&#7889;c, mi&#7877;n ph&iacute; v&#7853;n chuy&#7875;n cho &#273;&#417;n h&agrave;ng t&#7915; 500K.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
                 <div class="feature-box h-100">
                     <div class="icon-circle">
                         <i class="fas fa-shield-alt"></i>
@@ -405,7 +1186,7 @@
                     <p>Ch&#7871; &#273;&#7897; b&#7843;o h&agrave;nh l&ecirc;n &#273;&#7871;n 12 th&aacute;ng, &#273;&#7893;i m&#7899;i trong 7 ng&agrave;y n&#7871;u l&#7895;i.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
                 <div class="feature-box h-100">
                     <div class="icon-circle">
                         <i class="fas fa-headset"></i>
@@ -415,5 +1196,257 @@
                 </div>
             </div>
         </div>
+
+        <!-- Counter stats -->
+        <div class="row g-4 text-center" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-6 col-md-3">
+                <div class="stat-counter" data-target="1000">0</div>
+                <div class="stat-label">S&#7843;n ph&#7849;m</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-counter" data-target="5000">0</div>
+                <div class="stat-label">Kh&aacute;ch h&agrave;ng</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-counter" data-target="150">0</div>
+                <div class="stat-label">D&#7883;ch v&#7909; s&#7917;a ch&#7919;a</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-counter" data-target="99">0</div>
+                <div class="stat-label">% H&agrave;i l&ograve;ng</div>
+            </div>
+        </div>
     </div>
 </section>
+
+<!-- ============================================
+     TESTIMONIALS
+     ============================================ -->
+<section class="py-5 testimonial-section">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fas fa-comments me-1"></i>&#272;&aacute;nh gi&aacute;</span>
+            <h2>Kh&aacute;ch h&agrave;ng n&oacute;i g&igrave;?</h2>
+            <p>Nh&#7919;ng &#273;&aacute;nh gi&aacute; ch&acirc;n th&#7921;c t&#7915; kh&aacute;ch h&agrave;ng c&#7911;a ch&uacute;ng t&ocirc;i</p>
+        </div>
+
+        <div class="swiper testimonials-swiper" id="testimonialsSwiper" data-aos="fade-up" data-aos-delay="200">
+            <div class="swiper-wrapper">
+                <!-- Review 1 -->
+                <div class="swiper-slide" style="height: auto;">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-right quote-icon"></i>
+                        <div class="testimonial-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"S&#7843;n ph&#7849;m ch&#7845;t l&#432;&#7907;ng tuy&#7879;t v&#7901;i, giao h&agrave;ng c&#7921;c nhanh. T&ocirc;i r&#7845;t h&agrave;i l&ograve;ng v&#7899;i chi&#7871;c &#7889;p l&#432;ng v&agrave; c&aacute;p s&#7841;c &#273;&atilde; mua. S&#7869; ti&#7871;p t&#7909;c &#7911;ng h&#7897;!"</p>
+                        <div class="testimonial-author">Nguy&#7877;n V&#259;n Minh</div>
+                        <div class="testimonial-role">Kh&aacute;ch h&agrave;ng t&#7841;i TP.HCM</div>
+                    </div>
+                </div>
+                <!-- Review 2 -->
+                <div class="swiper-slide" style="height: auto;">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-right quote-icon"></i>
+                        <div class="testimonial-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"D&#7883;ch v&#7909; s&#7917;a ch&#7919;a r&#7845;t chuy&ecirc;n nghi&#7879;p. M&agrave;n h&igrave;nh &#273;i&#7879;n tho&#7841;i &#273;&#432;&#7907;c thay m&#7899;i ch&#7881; trong 30 ph&uacute;t, gi&aacute; h&#7907;p l&yacute; v&agrave; b&#7843;o h&agrave;nh d&agrave;i h&#7841;n."</p>
+                        <div class="testimonial-author">Tr&#7847;n Th&#7883; H&#432;&#417;ng</div>
+                        <div class="testimonial-role">Kh&aacute;ch h&agrave;ng t&#7841;i H&agrave; N&#7897;i</div>
+                    </div>
+                </div>
+                <!-- Review 3 -->
+                <div class="swiper-slide" style="height: auto;">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-right quote-icon"></i>
+                        <div class="testimonial-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="testimonial-text">"Mua tai nghe Bluetooth t&#7841;i &#273;&acirc;y gi&aacute; r&#7867; h&#417;n nhi&#7873;u n&#417;i kh&aacute;c m&agrave; v&#7851;n l&agrave; h&agrave;ng ch&iacute;nh h&atilde;ng. Nh&acirc;n vi&ecirc;n t&#432; v&#7845;n r&#7845;t nhi&#7879;t t&igrave;nh."</p>
+                        <div class="testimonial-author">L&ecirc; Ho&agrave;ng Nam</div>
+                        <div class="testimonial-role">Kh&aacute;ch h&agrave;ng t&#7841;i &#272;&agrave; N&#7861;ng</div>
+                    </div>
+                </div>
+                <!-- Review 4 -->
+                <div class="swiper-slide" style="height: auto;">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-right quote-icon"></i>
+                        <div class="testimonial-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"&#272;&atilde; s&#7917; d&#7909;ng d&#7883;ch v&#7909; nhi&#7873;u l&#7847;n v&agrave; l&#7847;n n&agrave;o c&#361;ng r&#7845;t h&agrave;i l&ograve;ng. Pin &#273;i&#7879;n tho&#7841;i &#273;&#432;&#7907;c thay m&#7899;i ch&#7845;t l&#432;&#7907;ng, d&ugrave;ng c&#7843; ng&agrave;y kh&ocirc;ng h&#7871;t."</p>
+                        <div class="testimonial-author">Ph&#7841;m Th&ugrave;y Linh</div>
+                        <div class="testimonial-role">Kh&aacute;ch h&agrave;ng t&#7841;i C&#7847;n Th&#417;</div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     CTA BANNER
+     ============================================ -->
+<section class="cta-banner" data-aos="fade-up">
+    <div class="cta-content">
+        <h2>&#272;&#259;ng k&yacute; nh&#7853;n &#432;u &#273;&atilde;i</h2>
+        <p>Nh&#7853;p email &#273;&#7875; nh&#7853;n th&ocirc;ng tin khuy&#7871;n m&atilde;i &#273;&#7897;c quy&#7873;n v&agrave; m&atilde; gi&#7843;m gi&aacute; t&#7915; PhuKien247!</p>
+        <div class="cta-email-form">
+            <input type="email" placeholder="Nh&#7853;p email c&#7911;a b&#7841;n..." />
+            <button type="button"><i class="fas fa-paper-plane me-1"></i>&#272;&#259;ng k&yacute;</button>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // ============================================
+    // HERO SWIPER
+    // ============================================
+    var heroSwiper = new Swiper('#heroSwiper', {
+        loop: true,
+        speed: 800,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        parallax: true,
+        effect: 'fade',
+        fadeEffect: {
+            crossFade: true
+        },
+        pagination: {
+            el: '#heroSwiper .swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '#heroSwiper .swiper-button-next',
+            prevEl: '#heroSwiper .swiper-button-prev',
+        },
+    });
+
+    // ============================================
+    // PRODUCTS SWIPER
+    // ============================================
+    var productsSwiper = new Swiper('#productsSwiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        speed: 600,
+        pagination: {
+            el: '#productsSwiper .swiper-pagination',
+            clickable: true,
+        },
+        breakpoints: {
+            576: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+            },
+            768: {
+                slidesPerView: 2,
+                spaceBetween: 24,
+            },
+            992: {
+                slidesPerView: 3,
+                spaceBetween: 24,
+            },
+            1200: {
+                slidesPerView: 4,
+                spaceBetween: 24,
+            },
+        },
+    });
+
+    // ============================================
+    // TESTIMONIALS SWIPER
+    // ============================================
+    var testimonialsSwiper = new Swiper('#testimonialsSwiper', {
+        slidesPerView: 1,
+        spaceBetween: 24,
+        speed: 600,
+        autoplay: {
+            delay: 4000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '#testimonialsSwiper .swiper-pagination',
+            clickable: true,
+        },
+        breakpoints: {
+            768: {
+                slidesPerView: 2,
+                spaceBetween: 24,
+            },
+            1024: {
+                slidesPerView: 3,
+                spaceBetween: 24,
+            },
+        },
+    });
+
+    // ============================================
+    // COUNTER ANIMATION
+    // ============================================
+    (function () {
+        var counters = document.querySelectorAll('.stat-counter');
+        var animated = false;
+
+        function animateCounters() {
+            if (animated) return;
+            counters.forEach(function (counter) {
+                var rect = counter.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    animated = true;
+                    var target = parseInt(counter.getAttribute('data-target'), 10);
+                    var duration = 2000;
+                    var step = target / (duration / 16);
+                    var current = 0;
+
+                    function update() {
+                        current += step;
+                        if (current >= target) {
+                            counter.textContent = target.toLocaleString() + '+';
+                            return;
+                        }
+                        counter.textContent = Math.floor(current).toLocaleString() + '+';
+                        requestAnimationFrame(update);
+                    }
+                    update();
+                }
+            });
+        }
+
+        window.addEventListener('scroll', animateCounters, { passive: true });
+        animateCounters();
+    })();
+</script>
+}

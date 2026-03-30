@@ -4,117 +4,480 @@
     ViewData["Title"] = "Thanh toán";
 }
 
-<div class="container py-4">
-    <h2 class="mb-4"><i class="fas fa-credit-card me-2"></i>Thanh toán</h2>
+@section Styles {
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        .checkout-page {
+            background: #f5f5f7;
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0 3rem;
+        }
 
-    <form asp-action="Checkout" method="post">
-        <div class="row g-4">
-            <!-- Order Summary -->
-            <div class="col-lg-7">
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Đơn hàng của bạn</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Sản phẩm</th>
-                                        <th class="text-center">SL</th>
-                                        <th class="text-end">Đơn giá</th>
-                                        <th class="text-end">Thành tiền</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (int i = 0; i < Model.CartItems.Count; i++)
-                                    {
-                                        var item = Model.CartItems[i];
-                                        <tr>
-                                            <td>@item.ProductName</td>
-                                            <td class="text-center">@item.Quantity</td>
-                                            <td class="text-end">@item.Price.ToString("N0") đ</td>
-                                            <td class="text-end fw-bold">@item.Total.ToString("N0") đ</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                                <tfoot class="table-light">
-                                    <tr>
-                                        <td colspan="3" class="text-end fw-bold">Tổng cộng:</td>
-                                        <td class="text-end fw-bold text-danger fs-5">@Model.TotalAmount.ToString("N0") đ</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        /* Breadcrumb */
+        .checkout-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        .checkout-breadcrumb a {
+            color: #FF6B35;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .checkout-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .checkout-breadcrumb .separator {
+            color: #bbb;
+        }
+        .checkout-breadcrumb .current {
+            color: #555;
+            font-weight: 600;
+        }
 
-            <!-- Shipping & Payment Info -->
-            <div class="col-lg-5">
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Thông tin giao hàng</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label asp-for="ShippingAddress" class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
-                            <textarea asp-for="ShippingAddress" class="form-control" rows="3" placeholder="Nhập địa chỉ giao hàng"></textarea>
-                            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                            <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="Note" class="form-label">Ghi chú</label>
-                            <textarea asp-for="Note" class="form-control" rows="2" placeholder="Ghi chú thêm (không bắt buộc)"></textarea>
-                        </div>
-                    </div>
-                </div>
+        .checkout-header {
+            margin-bottom: 2rem;
+        }
+        .checkout-header h2 {
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .checkout-header h2 .header-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2rem;
+        }
 
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Phương thức thanh toán</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="COD" id="paymentCOD" checked />
-                            <label class="form-check-label" for="paymentCOD">
-                                <i class="fas fa-money-bill-wave me-1 text-success"></i>
-                                Thanh toán khi nhận hàng (COD)
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="BankTransfer" id="paymentBank" />
-                            <label class="form-check-label" for="paymentBank">
-                                <i class="fas fa-university me-1 text-primary"></i>
-                                Chuyển khoản ngân hàng
-                            </label>
-                        </div>
-                    </div>
-                </div>
+        /* Form sections */
+        .checkout-section {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+        .section-header .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .section-header h5 {
+            margin: 0;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .section-body {
+            padding: 1.5rem;
+        }
+        .section-body .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #444;
+        }
+        .section-body .form-control,
+        .section-body textarea.form-control {
+            border-radius: 10px;
+            border: 1.5px solid #e0e0e0;
+            padding: 0.65rem 1rem;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .section-body .form-control:focus {
+            border-color: #FF6B35;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
 
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">Tổng thanh toán:</h5>
-                            <h4 class="mb-0 text-danger fw-bold">@Model.TotalAmount.ToString("N0") đ</h4>
-                        </div>
-                        <button type="submit" class="btn btn-pk w-100 btn-lg">
-                            <i class="fas fa-check-circle me-1"></i>Đặt hàng
-                        </button>
-                        <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">
-                            <i class="fas fa-arrow-left me-1"></i>Quay lại giỏ hàng
-                        </a>
-                    </div>
-                </div>
-            </div>
+        /* Payment method cards */
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.75rem;
+        }
+        .payment-option:hover {
+            border-color: #ffcbb0;
+            background: #fff9f5;
+        }
+        .payment-option.active {
+            border-color: #FF6B35;
+            background: #fff5f0;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+        }
+        .payment-option input[type="radio"] {
+            width: 1.2em;
+            height: 1.2em;
+            accent-color: #FF6B35;
+            flex-shrink: 0;
+        }
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .payment-icon.cod {
+            background: #ecfdf5;
+            color: #22c55e;
+        }
+        .payment-icon.bank {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+        .payment-label {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 0.95rem;
+        }
+        .payment-desc {
+            font-size: 0.82rem;
+            color: #888;
+        }
+
+        /* Order Summary Sidebar */
+        .order-summary {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+        }
+        .order-summary-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+        .order-summary-header h5 {
+            margin: 0;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .order-summary-body {
+            padding: 1.25rem 1.5rem;
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .order-item:last-of-type {
+            border-bottom: none;
+        }
+        .order-item-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        .order-item-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        .order-item-placeholder svg {
+            width: 22px;
+            height: 22px;
+            opacity: 0.3;
+        }
+        .order-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .order-item-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .order-item-qty {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        .order-item-price {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #FF6B35;
+            white-space: nowrap;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0;
+        }
+        .summary-divider {
+            border-top: 2px dashed #e0e0e0;
+            margin: 0.75rem 0;
+        }
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+        .summary-total .label {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+        .summary-total .value {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #FF6B35;
+        }
+
+        .btn-order {
+            background: linear-gradient(135deg, #FF6B35, #e55a26);
+            border: none;
+            border-radius: 12px;
+            padding: 0.85rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,107,53,0.35);
+            color: #fff;
+        }
+        .btn-back-cart {
+            border: 1.5px solid #ddd;
+            color: #666;
+            border-radius: 12px;
+            padding: 0.6rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: transparent;
+            font-size: 0.95rem;
+        }
+        .btn-back-cart:hover {
+            border-color: #FF6B35;
+            color: #FF6B35;
+        }
+
+        @@media (max-width: 991.98px) {
+            .summary-sticky {
+                position: static !important;
+            }
+        }
+    </style>
+}
+
+<section class="checkout-page">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="checkout-breadcrumb" data-aos="fade-down">
+            <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-cart me-1"></i>Giỏ hàng</a>
+            <span class="separator"><i class="fas fa-chevron-right" style="font-size:0.7rem;"></i></span>
+            <span class="current"><i class="fas fa-credit-card me-1"></i>Thanh toán</span>
+        </nav>
+
+        <div class="checkout-header" data-aos="fade-down" data-aos-delay="100">
+            <h2>
+                <span class="header-icon"><i class="fas fa-credit-card"></i></span>
+                Thanh toán
+            </h2>
         </div>
-    </form>
-</div>
+
+        <form asp-action="Checkout" method="post">
+            <div class="row g-4">
+                <!-- Left: Form -->
+                <div class="col-lg-7">
+                    <!-- Shipping Info -->
+                    <div class="checkout-section" data-aos="fade-up" data-aos-delay="100">
+                        <div class="section-header">
+                            <span class="section-icon"><i class="fas fa-truck"></i></span>
+                            <h5>Thông tin giao hàng</h5>
+                        </div>
+                        <div class="section-body">
+                            <div class="mb-3">
+                                <label asp-for="ShippingAddress" class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+                                <textarea asp-for="ShippingAddress" class="form-control" rows="3" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+                                <span asp-validation-for="ShippingAddress" class="text-danger small"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="PhoneNumber" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại liên hệ" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+                            <div>
+                                <label asp-for="Note" class="form-label">Ghi chú đơn hàng</label>
+                                <textarea asp-for="Note" class="form-control" rows="2" placeholder="Ghi chú thêm về đơn hàng (không bắt buộc)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="checkout-section" data-aos="fade-up" data-aos-delay="200">
+                        <div class="section-header">
+                            <span class="section-icon"><i class="fas fa-wallet"></i></span>
+                            <h5>Phương thức thanh toán</h5>
+                        </div>
+                        <div class="section-body">
+                            <label class="payment-option active" id="optionCOD" for="paymentCOD">
+                                <input type="radio" asp-for="PaymentMethod" value="COD" id="paymentCOD" checked />
+                                <div class="payment-icon cod">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div>
+                                    <div class="payment-label">Thanh toán khi nhận hàng (COD)</div>
+                                    <div class="payment-desc">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                                </div>
+                            </label>
+                            <label class="payment-option" id="optionBank" for="paymentBank">
+                                <input type="radio" asp-for="PaymentMethod" value="BankTransfer" id="paymentBank" />
+                                <div class="payment-icon bank">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div>
+                                    <div class="payment-label">Chuyển khoản ngân hàng</div>
+                                    <div class="payment-desc">Chuyển khoản trước khi giao hàng</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Order Summary -->
+                <div class="col-lg-5">
+                    <div class="summary-sticky" style="position: sticky; top: 90px;">
+                        <div class="order-summary" data-aos="fade-left" data-aos-delay="200">
+                            <div class="order-summary-header">
+                                <h5><i class="fas fa-list-alt me-2"></i>Đơn hàng của bạn (@Model.CartItems.Count sản phẩm)</h5>
+                            </div>
+                            <div class="order-summary-body">
+                                @for (int i = 0; i < Model.CartItems.Count; i++)
+                                {
+                                    var item = Model.CartItems[i];
+                                    <div class="order-item">
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" alt="@item.ProductName" class="order-item-img" />
+                                        }
+                                        else
+                                        {
+                                            <div class="order-item-placeholder">
+                                                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <rect x="4" y="8" width="40" height="32" rx="4" stroke="#ccc" stroke-width="2"/>
+                                                    <circle cx="16" cy="20" r="4" stroke="#ccc" stroke-width="2"/>
+                                                    <path d="M4 32l12-10 8 6 8-6 12 10" stroke="#ccc" stroke-width="2"/>
+                                                </svg>
+                                            </div>
+                                        }
+                                        <div class="order-item-info">
+                                            <div class="order-item-name">@item.ProductName</div>
+                                            <div class="order-item-qty">x@item.Quantity</div>
+                                        </div>
+                                        <div class="order-item-price">@item.Total.ToString("N0") đ</div>
+                                    </div>
+                                }
+
+                                <div class="summary-divider"></div>
+
+                                <div class="summary-row">
+                                    <span style="color:#666;">Tạm tính</span>
+                                    <span class="fw-semibold">@Model.TotalAmount.ToString("N0") đ</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span style="color:#666;">Phí vận chuyển</span>
+                                    <span class="fw-semibold" style="color:#22c55e;">Miễn phí</span>
+                                </div>
+
+                                <div class="summary-divider"></div>
+
+                                <div class="summary-total">
+                                    <span class="label">Tổng thanh toán</span>
+                                    <span class="value">@Model.TotalAmount.ToString("N0") đ</span>
+                                </div>
+
+                                <div class="d-grid mt-3">
+                                    <button type="submit" class="btn btn-order">
+                                        <i class="fas fa-check-circle me-2"></i>Đặt hàng
+                                    </button>
+                                </div>
+                                <div class="d-grid mt-2">
+                                    <a asp-controller="Cart" asp-action="Index" class="btn btn-back-cart">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
+                                    </a>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <small style="color:#999;">
+                                        <i class="fas fa-shield-alt me-1"></i>Thông tin của bạn được bảo mật
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true });
+
+        // Payment option card selection
+        document.querySelectorAll('.payment-option').forEach(function(option) {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.payment-option').forEach(function(o) {
+                    o.classList.remove('active');
+                });
+                this.classList.add('active');
+                var radio = this.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
+            });
+        });
+    </script>
 }

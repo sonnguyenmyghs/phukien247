@@ -3,47 +3,269 @@
     ViewData["Title"] = "Đăng nhập";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm mt-4">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Đăng nhập</h3>
+@section Styles {
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        .login-bg {
+            min-height: calc(100vh - 200px);
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 50%, #ffd6c4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .login-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .login-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+            overflow: hidden;
+            max-width: 440px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .login-accent-bar {
+            height: 5px;
+            background: linear-gradient(90deg, #FF6B35, #ff9a6c, #FF6B35);
+        }
+        .login-header {
+            text-align: center;
+            padding: 2.5rem 2rem 0.5rem;
+        }
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 25px rgba(255,107,53,0.3);
+        }
+        .login-icon i {
+            font-size: 1.8rem;
+            color: #fff;
+        }
+        .login-header h3 {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 0.3rem;
+        }
+        .login-header p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .login-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+        .login-body .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 0.4rem;
+        }
+        .login-body .form-control {
+            border-radius: 12px;
+            padding: 0.7rem 1rem 0.7rem 2.8rem;
+            border: 1.5px solid #e0e0e0;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .login-body .form-control:focus {
+            border-color: #FF6B35;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+        .input-icon-wrap {
+            position: relative;
+        }
+        .input-icon-wrap .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .input-icon-wrap .form-control:focus ~ .input-icon,
+        .input-icon-wrap .form-control:not(:placeholder-shown) ~ .input-icon {
+            color: #FF6B35;
+        }
+        .remember-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .remember-check .form-check-input {
+            width: 1.15em;
+            height: 1.15em;
+            border-radius: 4px;
+            border: 1.5px solid #ccc;
+            cursor: pointer;
+        }
+        .remember-check .form-check-input:checked {
+            background-color: #FF6B35;
+            border-color: #FF6B35;
+        }
+        .remember-check .form-check-input:focus {
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.15);
+        }
+        .remember-check label {
+            font-size: 0.9rem;
+            color: #666;
+            cursor: pointer;
+            margin: 0;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #FF6B35, #e55a26);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+            letter-spacing: 0.3px;
+        }
+        .btn-login:hover {
+            background: linear-gradient(135deg, #e55a26, #d14e1d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,107,53,0.35);
+            color: #fff;
+        }
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        .login-footer {
+            text-align: center;
+            padding: 0 2rem 2rem;
+        }
+        .login-footer .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .login-footer .divider::before,
+        .login-footer .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e8e8e8;
+        }
+        .login-footer .divider span {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+        .login-footer a {
+            color: #FF6B35;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .login-footer a:hover {
+            color: #e55a26;
+            text-decoration: underline;
+        }
+    </style>
+}
 
-                <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<section class="login-bg">
+    <div class="login-card" data-aos="fade-up" data-aos-duration="600">
+        <div class="login-accent-bar"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">Email</label>
-                        <input asp-for="Email" class="form-control" placeholder="Nhập email" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label">Mật khẩu</label>
-                        <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        <input asp-for="RememberMe" class="form-check-input" />
-                        <label asp-for="RememberMe" class="form-check-label">Ghi nhớ đăng nhập</label>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Đăng nhập</button>
-                    </div>
-                </form>
-
-                <hr />
-                <p class="text-center mb-0">
-                    Chưa có tài khoản?
-                    <a asp-action="Register">Đăng ký ngay</a>
-                </p>
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-lock"></i>
             </div>
+            <h3>Đăng nhập</h3>
+            <p>Chào mừng bạn quay trở lại PhuKien247</p>
+        </div>
+
+        <div class="login-body">
+            <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 rounded-3" style="display:none;"></div>
+
+                <div class="mb-3" data-aos="fade-up" data-aos-delay="100">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <div class="input-icon-wrap">
+                        <input asp-for="Email" class="form-control" placeholder="Nhập email của bạn" />
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3" data-aos="fade-up" data-aos-delay="150">
+                    <label asp-for="Password" class="form-label">Mật khẩu</label>
+                    <div class="input-icon-wrap">
+                        <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
+                        <i class="fas fa-key input-icon"></i>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4 d-flex justify-content-between align-items-center" data-aos="fade-up" data-aos-delay="200">
+                    <div class="remember-check">
+                        <input asp-for="RememberMe" class="form-check-input" id="RememberMe" />
+                        <label for="RememberMe">Nhớ mật khẩu</label>
+                    </div>
+                </div>
+
+                <div class="d-grid" data-aos="fade-up" data-aos-delay="250">
+                    <button type="submit" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="login-footer" data-aos="fade-up" data-aos-delay="300">
+            <div class="divider"><span>hoặc</span></div>
+            <p class="mb-0" style="color: #666;">
+                Chưa có tài khoản?
+                <a asp-action="Register">Đăng ký ngay</a>
+            </p>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true });
+        // Show validation summary if it has content
+        document.addEventListener('DOMContentLoaded', function() {
+            var summary = document.querySelector('[data-valmsg-summary]');
+            if (summary && summary.querySelector('li')) {
+                summary.style.display = 'block';
+            }
+        });
+    </script>
 }

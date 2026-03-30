@@ -4,69 +4,280 @@
     ViewData["Title"] = "Lịch sử đơn hàng";
 }
 
-<div class="container py-4">
-    <h2 class="mb-4"><i class="fas fa-clipboard-list me-2"></i>Lịch sử đơn hàng</h2>
+@section Styles {
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        .history-page {
+            background: #f5f5f7;
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0 3rem;
+        }
+        .history-header {
+            margin-bottom: 2rem;
+        }
+        .history-header h2 {
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .history-header h2 .header-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #FF6B35, #ff9a6c);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+        .history-header p {
+            color: #888;
+            margin-left: 3.5rem;
+            margin-top: 0.25rem;
+        }
 
-    @if (Model == null || !Model.Any())
-    {
-        <div class="text-center py-5">
-            <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
-            <h4 class="text-muted">Chưa có đơn hàng</h4>
-            <p class="text-muted">Bạn chưa có đơn hàng nào.</p>
-            <a asp-controller="Product" asp-action="Index" class="btn btn-pk mt-2">
-                <i class="fas fa-shopping-bag me-1"></i>Mua sắm ngay
-            </a>
-        </div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Mã đơn</th>
-                        <th>Ngày đặt</th>
-                        <th class="text-end">Tổng tiền</th>
-                        <th class="text-center">Trạng thái</th>
-                        <th class="text-center">Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var order in Model)
-                    {
-                        <tr>
-                            <td><strong>#@order.Id</strong></td>
-                            <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td class="text-end fw-bold text-danger">@order.TotalAmount.ToString("N0") đ</td>
-                            <td class="text-center">
-                                @switch (order.Status)
-                                {
-                                    case PhuKien247.Models.OrderStatus.ChoXacNhan:
-                                        <span class="badge bg-warning text-dark">Chờ xác nhận</span>
-                                        break;
-                                    case PhuKien247.Models.OrderStatus.DaXacNhan:
-                                        <span class="badge bg-info text-dark">Đã xác nhận</span>
-                                        break;
-                                    case PhuKien247.Models.OrderStatus.DangGiao:
-                                        <span class="badge bg-primary">Đang giao</span>
-                                        break;
-                                    case PhuKien247.Models.OrderStatus.HoanThanh:
-                                        <span class="badge bg-success">Hoàn thành</span>
-                                        break;
-                                    case PhuKien247.Models.OrderStatus.DaHuy:
-                                        <span class="badge bg-danger">Đã hủy</span>
-                                        break;
-                                }
-                            </td>
-                            <td class="text-center">
-                                <a asp-action="Confirmation" asp-route-id="@order.Id" class="btn btn-sm btn-pk-outline">
-                                    <i class="fas fa-eye me-1"></i>Xem
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-</div>
+        /* Order Card */
+        .order-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .order-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .order-id {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+        }
+        .order-id .hash {
+            color: #FF6B35;
+        }
+        .order-date {
+            color: #999;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .status-cho-xac-nhan {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .status-da-xac-nhan {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .status-dang-giao {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+        .status-hoan-thanh {
+            background: #ecfdf5;
+            color: #16a34a;
+        }
+        .status-da-huy {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .order-card-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .order-total-label {
+            font-size: 0.88rem;
+            color: #888;
+        }
+        .order-total-value {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #FF6B35;
+        }
+        .btn-view-detail {
+            border: 1.5px solid #FF6B35;
+            color: #FF6B35;
+            border-radius: 10px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: transparent;
+            text-decoration: none;
+        }
+        .btn-view-detail:hover {
+            background: #FF6B35;
+            color: #fff;
+        }
+
+        /* Empty state */
+        .empty-history {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .empty-history-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fff5f0, #ffe8dc);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .empty-history-icon svg {
+            width: 56px;
+            height: 56px;
+        }
+        .empty-history h4 {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 0.5rem;
+        }
+        .empty-history p {
+            color: #888;
+            font-size: 1.05rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn-shop-now {
+            background: linear-gradient(135deg, #FF6B35, #e55a26);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-shop-now:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,107,53,0.35);
+            color: #fff;
+        }
+    </style>
+}
+
+<section class="history-page">
+    <div class="container">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-history" data-aos="fade-up">
+                <div class="empty-history-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="8" width="44" height="48" rx="4" stroke="#FF6B35" stroke-width="2.5" fill="none"/>
+                        <path d="M20 22h24M20 30h24M20 38h16" stroke="#ffb088" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="46" cy="46" r="10" fill="#fff5f0" stroke="#FF6B35" stroke-width="2"/>
+                        <path d="M43 46h6M46 43v6" stroke="#FF6B35" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h4>Chưa có đơn hàng nào</h4>
+                <p>Bạn chưa đặt đơn hàng nào.<br/>Hãy khám phá các sản phẩm hấp dẫn của chúng tôi!</p>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-shop-now">
+                    <i class="fas fa-shopping-bag me-2"></i>Mua sắm ngay
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="history-header" data-aos="fade-down">
+                <h2>
+                    <span class="header-icon"><i class="fas fa-clipboard-list"></i></span>
+                    Lịch sử đơn hàng
+                </h2>
+                <p>Bạn có @Model.Count đơn hàng</p>
+            </div>
+
+            @for (int orderIdx = 0; orderIdx < Model.Count; orderIdx++)
+            {
+                var order = Model[orderIdx];
+                <div class="order-card" data-aos="fade-up" data-aos-delay="@(orderIdx * 80)">
+                    <div class="order-card-header">
+                        <div>
+                            <span class="order-id"><span class="hash">#</span>@order.Id</span>
+                            <span class="order-date ms-3">
+                                <i class="fas fa-calendar-alt"></i>
+                                @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </span>
+                        </div>
+                        <div>
+                            @switch (order.Status)
+                            {
+                                case PhuKien247.Models.OrderStatus.ChoXacNhan:
+                                    <span class="status-badge status-cho-xac-nhan">
+                                        <i class="fas fa-clock"></i> Chờ xác nhận
+                                    </span>
+                                    break;
+                                case PhuKien247.Models.OrderStatus.DaXacNhan:
+                                    <span class="status-badge status-da-xac-nhan">
+                                        <i class="fas fa-check"></i> Đã xác nhận
+                                    </span>
+                                    break;
+                                case PhuKien247.Models.OrderStatus.DangGiao:
+                                    <span class="status-badge status-dang-giao">
+                                        <i class="fas fa-truck"></i> Đang giao
+                                    </span>
+                                    break;
+                                case PhuKien247.Models.OrderStatus.HoanThanh:
+                                    <span class="status-badge status-hoan-thanh">
+                                        <i class="fas fa-check-circle"></i> Hoàn thành
+                                    </span>
+                                    break;
+                                case PhuKien247.Models.OrderStatus.DaHuy:
+                                    <span class="status-badge status-da-huy">
+                                        <i class="fas fa-times-circle"></i> Đã hủy
+                                    </span>
+                                    break;
+                            }
+                        </div>
+                    </div>
+                    <div class="order-card-body">
+                        <div>
+                            <span class="order-total-label">Tổng tiền</span>
+                            <div class="order-total-value">@order.TotalAmount.ToString("N0") đ</div>
+                        </div>
+                        <a asp-action="Confirmation" asp-route-id="@order.Id" class="btn-view-detail">
+                            <i class="fas fa-eye me-1"></i>Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>AOS.init({ once: true });</script>
+}

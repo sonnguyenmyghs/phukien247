@@ -11,15 +11,38 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"
           crossorigin="anonymous" />
+    <!-- Swiper.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet" />
+    <!-- AOS (Animate On Scroll) CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     <style>
+        /* ============================================
+           CSS CUSTOM PROPERTIES
+           ============================================ */
         :root {
             --pk-orange: #FF6B35;
             --pk-orange-dark: #e55a26;
+            --pk-orange-light: #ff8f65;
             --pk-dark: #1a1a2e;
+            --pk-dark-2: #16213e;
             --pk-gray: #f8f9fa;
+            --pk-gradient: linear-gradient(135deg, var(--pk-orange) 0%, var(--pk-orange-light) 100%);
+            --pk-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --pk-shadow-hover: 0 12px 40px rgba(0,0,0,0.15);
+            --pk-radius: 16px;
+            --pk-transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* ============================================
+           GLOBAL RESET & BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -27,17 +50,72 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
         main {
             flex: 1;
         }
 
-        /* Navbar */
+        ::selection {
+            background-color: var(--pk-orange);
+            color: #fff;
+        }
+
+        /* ============================================
+           LOADING SPINNER
+           ============================================ */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .page-loader.loaded {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--pk-orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ============================================
+           NAVBAR - GLASSMORPHISM
+           ============================================ */
         .navbar-pk {
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
             padding: 0.6rem 0;
+            transition: var(--pk-transition);
+            z-index: 1050;
+        }
+
+        .navbar-pk.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 0.4rem 0;
         }
 
         .navbar-pk .navbar-brand {
@@ -45,6 +123,11 @@
             font-weight: 800;
             color: var(--pk-orange) !important;
             letter-spacing: -0.5px;
+            transition: var(--pk-transition);
+        }
+
+        .navbar-pk .navbar-brand:hover {
+            transform: scale(1.05);
         }
 
         .navbar-pk .navbar-brand i {
@@ -55,7 +138,26 @@
             color: var(--pk-dark) !important;
             font-weight: 500;
             padding: 0.5rem 1rem !important;
-            transition: color 0.2s;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-pk .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--pk-gradient);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .navbar-pk .nav-link:hover::after,
+        .navbar-pk .nav-link.active::after {
+            width: 70%;
         }
 
         .navbar-pk .nav-link:hover,
@@ -63,37 +165,191 @@
             color: var(--pk-orange) !important;
         }
 
-        .btn-pk {
-            background-color: var(--pk-orange);
-            border-color: var(--pk-orange);
+        /* Cart icon badge */
+        .cart-link {
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--pk-orange);
             color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @@keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* Animated hamburger */
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+            position: relative;
+            width: 36px;
+            height: 36px;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2.5px;
+            background-color: var(--pk-dark);
+            border-radius: 2px;
+            transition: var(--pk-transition);
+            position: absolute;
+        }
+
+        .hamburger span:nth-child(1) { top: 4px; }
+        .hamburger span:nth-child(2) { top: 11px; }
+        .hamburger span:nth-child(3) { top: 18px; }
+
+        .navbar-toggler[aria-expanded="true"] .hamburger span:nth-child(1) {
+            top: 11px;
+            transform: rotate(45deg);
+        }
+
+        .navbar-toggler[aria-expanded="true"] .hamburger span:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .navbar-toggler[aria-expanded="true"] .hamburger span:nth-child(3) {
+            top: 11px;
+            transform: rotate(-45deg);
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn-pk {
+            background: var(--pk-gradient);
+            border: none;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            transition: var(--pk-transition);
+            border-radius: 8px;
+        }
+
+        .btn-pk::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
         }
 
         .btn-pk:hover {
-            background-color: var(--pk-orange-dark);
-            border-color: var(--pk-orange-dark);
+            background: linear-gradient(135deg, var(--pk-orange-dark) 0%, var(--pk-orange) 100%);
             color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-pk:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-pk-outline {
-            border-color: var(--pk-orange);
+            border: 2px solid var(--pk-orange);
             color: var(--pk-orange);
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+            transition: var(--pk-transition);
+            border-radius: 8px;
         }
 
         .btn-pk-outline:hover {
-            background-color: var(--pk-orange);
+            background: var(--pk-orange);
             color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
         }
 
         .badge-pk {
-            background-color: var(--pk-orange);
+            background: var(--pk-gradient);
         }
 
-        /* Footer */
+        /* ============================================
+           GLOBAL CARD HOVER EFFECTS
+           ============================================ */
+        .card {
+            transition: var(--pk-transition);
+            border: none;
+            border-radius: var(--pk-radius);
+            overflow: hidden;
+            box-shadow: var(--pk-shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--pk-shadow-hover);
+        }
+
+        /* ============================================
+           FOOTER - GRADIENT DARK
+           ============================================ */
         .footer-pk {
-            background-color: var(--pk-dark);
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 40%, #302b63 100%);
             color: #ccc;
-            padding: 3rem 0 1.5rem;
+            padding: 4rem 0 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-pk::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .footer-pk::after {
+            content: '';
+            position: absolute;
+            bottom: -150px;
+            left: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,107,53,0.05) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
         .footer-pk h5 {
@@ -111,49 +367,193 @@
             left: 0;
             width: 40px;
             height: 3px;
-            background-color: var(--pk-orange);
+            background: var(--pk-gradient);
             border-radius: 2px;
         }
 
         .footer-pk a {
             color: #aaa;
             text-decoration: none;
-            transition: color 0.2s;
+            transition: all 0.3s ease;
         }
 
         .footer-pk a:hover {
             color: var(--pk-orange);
+            padding-left: 4px;
         }
 
+        /* Social icons with hover animations */
         .footer-pk .social-icons a {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background-color: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.08);
             color: #fff;
-            margin-right: 8px;
-            transition: background-color 0.2s;
+            margin-right: 10px;
+            transition: var(--pk-transition);
+            font-size: 1rem;
         }
 
         .footer-pk .social-icons a:hover {
-            background-color: var(--pk-orange);
+            background: var(--pk-gradient);
+            transform: translateY(-4px) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+            padding-left: 0;
+        }
+
+        /* Newsletter form */
+        .newsletter-form {
+            position: relative;
+            max-width: 100%;
+        }
+
+        .newsletter-form input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 0.7rem 1.2rem;
+            padding-right: 120px;
+            color: #fff;
+            width: 100%;
+            transition: var(--pk-transition);
+        }
+
+        .newsletter-form input::placeholder {
+            color: #888;
+        }
+
+        .newsletter-form input:focus {
+            outline: none;
+            border-color: var(--pk-orange);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+        }
+
+        .newsletter-form button {
+            position: absolute;
+            right: 4px;
+            top: 4px;
+            bottom: 4px;
+            border: none;
+            background: var(--pk-gradient);
+            color: #fff;
+            border-radius: 50px;
+            padding: 0 1.2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--pk-transition);
+        }
+
+        .newsletter-form button:hover {
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
         }
 
         .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 1.2rem;
-            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        /* ============================================
+           BACK TO TOP BUTTON
+           ============================================ */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--pk-gradient);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: var(--pk-transition);
+            z-index: 1040;
+            cursor: pointer;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.5);
+        }
+
+        /* ============================================
+           GLOBAL ANIMATIONS
+           ============================================ */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @@keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @@media (max-width: 991.98px) {
+            .navbar-pk .navbar-collapse {
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(20px);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-top: 0.5rem;
+                box-shadow: var(--pk-shadow);
+            }
         }
     </style>
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="spinner"></div>
+    </div>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-pk sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-pk sticky-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand" asp-controller="Home" asp-action="Index">
                 <i class="fas fa-mobile-alt"></i>PhuKien247
@@ -161,7 +561,11 @@
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                     aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </button>
 
             <div class="collapse navbar-collapse" id="mainNavbar">
@@ -182,8 +586,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Cart" asp-action="Index">
+                        <a class="nav-link cart-link" asp-controller="Cart" asp-action="Index">
                             <i class="fas fa-shopping-cart me-1"></i>Gi&#7887; h&agrave;ng
+                            <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
                         </a>
                     </li>
                 </ul>
@@ -244,37 +649,29 @@
 
     <!-- Footer -->
     <footer class="footer-pk">
-        <div class="container">
+        <div class="container position-relative" style="z-index: 1;">
             <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                     <h5><i class="fas fa-mobile-alt me-2"></i>PhuKien247</h5>
-                    <p>Chuy&ecirc;n cung c&#7845;p ph&#7909; ki&#7879;n &#273;i&#7879;n tho&#7841;i ch&iacute;nh h&atilde;ng v&agrave; d&#7883;ch v&#7909; s&#7917;a ch&#7919;a uy t&iacute;n t&#7841;i Vi&#7879;t Nam. Ch&uacute;ng t&ocirc;i cam k&#7871;t mang &#273;&#7871;n s&#7843;n ph&#7849;m ch&#7845;t l&#432;&#7907;ng v&#7899;i gi&aacute; c&#7843; h&#7907;p l&yacute; nh&#7845;t.</p>
+                    <p class="mb-3">Chuy&ecirc;n cung c&#7845;p ph&#7909; ki&#7879;n &#273;i&#7879;n tho&#7841;i ch&iacute;nh h&atilde;ng v&agrave; d&#7883;ch v&#7909; s&#7917;a ch&#7919;a uy t&iacute;n t&#7841;i Vi&#7879;t Nam. Ch&uacute;ng t&ocirc;i cam k&#7871;t mang &#273;&#7871;n s&#7843;n ph&#7849;m ch&#7845;t l&#432;&#7907;ng v&#7899;i gi&aacute; c&#7843; h&#7907;p l&yacute; nh&#7845;t.</p>
                     <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-tiktok"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="TikTok"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" title="Zalo"><i class="fas fa-comment-dots"></i></a>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-2 col-md-6" data-aos="fade-up" data-aos-delay="100">
                     <h5>Li&ecirc;n k&#7871;t</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a asp-controller="Home" asp-action="Index">Trang ch&#7911;</a></li>
-                        <li class="mb-2"><a asp-controller="Product" asp-action="Index">S&#7843;n ph&#7849;m</a></li>
-                        <li class="mb-2"><a asp-controller="RepairService" asp-action="Index">S&#7917;a ch&#7919;a</a></li>
-                        <li class="mb-2"><a asp-controller="Home" asp-action="Privacy">Ch&iacute;nh s&aacute;ch</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Index"><i class="fas fa-chevron-right me-1 small"></i>Trang ch&#7911;</a></li>
+                        <li class="mb-2"><a asp-controller="Product" asp-action="Index"><i class="fas fa-chevron-right me-1 small"></i>S&#7843;n ph&#7849;m</a></li>
+                        <li class="mb-2"><a asp-controller="RepairService" asp-action="Index"><i class="fas fa-chevron-right me-1 small"></i>S&#7917;a ch&#7919;a</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Privacy"><i class="fas fa-chevron-right me-1 small"></i>Ch&iacute;nh s&aacute;ch</a></li>
                     </ul>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <h5>H&#7895; tr&#7907;</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#">H&#432;&#7899;ng d&#7851;n mua h&agrave;ng</a></li>
-                        <li class="mb-2"><a href="#">Ch&iacute;nh s&aacute;ch &#273;&#7893;i tr&#7843;</a></li>
-                        <li class="mb-2"><a href="#">Ch&iacute;nh s&aacute;ch b&#7843;o h&agrave;nh</a></li>
-                        <li class="mb-2"><a href="#">C&acirc;u h&#7887;i th&#432;&#7901;ng g&#7863;p</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
                     <h5>Li&ecirc;n h&#7879;</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2">
@@ -295,17 +692,135 @@
                         </li>
                     </ul>
                 </div>
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <h5>&#272;&#259;ng k&yacute; nh&#7853;n tin</h5>
+                    <p class="small mb-3">Nh&#7853;n th&ocirc;ng tin khuy&#7871;n m&atilde;i v&agrave; s&#7843;n ph&#7849;m m&#7899;i nh&#7845;t t&#7915; PhuKien247.</p>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Email c&#7911;a b&#7841;n..." />
+                        <button type="button"><i class="fas fa-paper-plane me-1"></i>G&#7917;i</button>
+                    </div>
+                </div>
             </div>
             <div class="footer-bottom text-center">
-                <small>&copy; 2026 PhuKien247. T&#7845;t c&#7843; quy&#7873;n &#273;&#432;&#7907;c b&#7843;o l&#432;u.</small>
+                <small>&copy; 2026 PhuKien247. T&#7845;t c&#7843; quy&#7873;n &#273;&#432;&#7907;c b&#7843;o l&#432;u. <i class="fas fa-heart" style="color: var(--pk-orange);"></i></small>
             </div>
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" title="V&#7873; &#273;&#7847;u trang">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
+    <!-- Swiper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- AOS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // ============================================
+        // PAGE LOADER
+        // ============================================
+        window.addEventListener('load', function () {
+            var loader = document.getElementById('pageLoader');
+            if (loader) {
+                loader.classList.add('loaded');
+                setTimeout(function () { loader.style.display = 'none'; }, 600);
+            }
+        });
+
+        // ============================================
+        // AOS INIT
+        // ============================================
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 60
+        });
+
+        // ============================================
+        // NAVBAR SCROLL EFFECT
+        // ============================================
+        (function () {
+            var navbar = document.getElementById('mainNav');
+            if (!navbar) return;
+            function onScroll() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+
+        // ============================================
+        // BACK TO TOP BUTTON
+        // ============================================
+        (function () {
+            var btn = document.getElementById('backToTop');
+            if (!btn) return;
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 400) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            }, { passive: true });
+
+            btn.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        })();
+
+        // ============================================
+        // SMOOTH SCROLL FOR ANCHOR LINKS
+        // ============================================
+        document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+            anchor.addEventListener('click', function (e) {
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ============================================
+        // CART BADGE FROM COOKIE
+        // ============================================
+        (function () {
+            var badge = document.getElementById('cartBadge');
+            if (!badge) return;
+            function getCookie(name) {
+                var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                return match ? decodeURIComponent(match[2]) : null;
+            }
+            function updateCartBadge() {
+                var count = 0;
+                var cartCookie = getCookie('CartItemCount');
+                if (cartCookie) {
+                    count = parseInt(cartCookie, 10) || 0;
+                }
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+            updateCartBadge();
+            setInterval(updateCartBadge, 3000);
+        })();
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -31,6 +31,9 @@ public class HomeController : Controller
             .Where(s => s.IsActive)
             .ToListAsync();
 
+        ViewBag.Categories = await _context.Categories
+            .ToListAsync();
+
         return View();
     }
 

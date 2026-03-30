@@ -3,91 +3,299 @@
     ViewData["Title"] = "Đặt lịch sửa chữa - " + service?.Name;
 }
 
-<div class="container">
+@section Styles {
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        /* Breadcrumb */
+        .breadcrumb-modern {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+        }
+        .breadcrumb-modern .breadcrumb {
+            margin-bottom: 0;
+        }
+        .breadcrumb-modern .breadcrumb-item a {
+            color: var(--pk-orange);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .breadcrumb-modern .breadcrumb-item a:hover {
+            color: var(--pk-orange-dark);
+        }
+        .breadcrumb-modern .breadcrumb-item.active {
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* Service Info Card */
+        .service-info-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(26,26,46,0.2);
+        }
+        .service-info-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255,107,53,0.1);
+        }
+        .service-info-card .service-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--pk-orange), var(--pk-orange-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .service-info-card h4 {
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+        .service-info-card .info-detail {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        .service-info-card .info-detail strong {
+            color: #ffc107;
+        }
+        .service-info-card .price-highlight {
+            color: var(--pk-orange);
+            font-weight: 800;
+            font-size: 1.4rem;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: #fff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .form-card .form-header {
+            background: linear-gradient(135deg, var(--pk-orange), var(--pk-orange-dark));
+            color: #fff;
+            padding: 1.3rem 2rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .form-card .form-body {
+            padding: 2rem;
+        }
+
+        /* Form Fields */
+        .form-group-modern {
+            margin-bottom: 1.5rem;
+        }
+        .form-group-modern label {
+            font-weight: 700;
+            color: var(--pk-dark);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .form-group-modern .form-control {
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .form-group-modern .form-control:focus {
+            border-color: var(--pk-orange);
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+        }
+        .form-group-modern .form-control::placeholder {
+            color: #bbb;
+        }
+        .form-group-modern .form-control[readonly] {
+            background: #f8f9fa;
+            color: #666;
+        }
+        .form-group-modern textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .required-star {
+            color: #e53935;
+            font-weight: 700;
+        }
+
+        /* Buttons */
+        .btn-submit-booking {
+            border: none;
+            border-radius: 14px;
+            padding: 0.85rem 2.5rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            background: linear-gradient(135deg, var(--pk-orange), var(--pk-orange-dark));
+            color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+        }
+        .btn-submit-booking:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,107,53,0.4);
+            color: #fff;
+        }
+        .btn-back {
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            padding: 0.85rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #fff;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            border-color: var(--pk-dark);
+            color: var(--pk-dark);
+        }
+
+        /* Validation */
+        .text-danger {
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+    </style>
+}
+
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a asp-controller="RepairService" asp-action="Index">Dịch vụ sửa chữa</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Đặt lịch</li>
-                </ol>
-            </nav>
+            <div class="breadcrumb-modern mb-4" data-aos="fade-down" data-aos-duration="400">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="RepairService" asp-action="Index">Dịch vụ sửa chữa</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Đặt lịch</li>
+                    </ol>
+                </nav>
+            </div>
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Đặt lịch sửa chữa</h4>
-                </div>
-                <div class="card-body">
-                    @if (service != null)
-                    {
-                        <!-- Service Info -->
-                        <div class="alert alert-info mb-4">
-                            <h5 class="mb-1">@service.Name</h5>
-                            <p class="mb-1">Giá dịch vụ: <strong class="text-danger">@service.Price.ToString("N0") đ</strong></p>
-                            @if (!string.IsNullOrEmpty(service.EstimatedTime))
-                            {
-                                <p class="mb-0">Thời gian ước tính: <strong>@service.EstimatedTime</strong></p>
-                            }
+            @if (service != null)
+            {
+                <!-- Service Info Card -->
+                <div class="service-info-card mb-4" data-aos="fade-up" data-aos-duration="500">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="service-icon">
+                            <i class="fas fa-tools"></i>
                         </div>
+                        <div class="flex-grow-1">
+                            <h4>@service.Name</h4>
+                            <div class="d-flex flex-wrap gap-3 align-items-center">
+                                <span class="price-highlight">
+                                    <i class="fas fa-tag me-1"></i>@service.Price.ToString("N0") đ
+                                </span>
+                                @if (!string.IsNullOrEmpty(service.EstimatedTime))
+                                {
+                                    <span class="info-detail">
+                                        <i class="fas fa-clock me-1"></i>Thời gian ước tính: <strong>@service.EstimatedTime</strong>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Booking Form -->
+                <div class="form-card" data-aos="fade-up" data-aos-duration="500" data-aos-delay="100">
+                    <div class="form-header">
+                        <i class="fas fa-calendar-alt me-2"></i>Thông tin đặt lịch
+                    </div>
+                    <div class="form-body">
                         <form asp-controller="RepairService" asp-action="Book" asp-route-serviceId="@service.Id" method="post">
                             <!-- Service Name (readonly) -->
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Dịch vụ</label>
+                            <div class="form-group-modern">
+                                <label><i class="fas fa-wrench me-1"></i>Dịch vụ</label>
                                 <input type="text" class="form-control" value="@service.Name" readonly />
                             </div>
 
                             <!-- Device Info -->
-                            <div class="mb-3">
-                                <label for="deviceInfo" class="form-label fw-bold">Thông tin thiết bị <span class="text-danger">*</span></label>
+                            <div class="form-group-modern">
+                                <label for="deviceInfo">
+                                    <i class="fas fa-mobile-alt me-1"></i>Thông tin thiết bị <span class="required-star">*</span>
+                                </label>
                                 <input type="text" class="form-control" id="deviceInfo" name="deviceInfo"
                                        placeholder="Ví dụ: iPhone 15 Pro Max, Samsung Galaxy S24..."
                                        required />
                                 @if (ViewContext.ModelState.ContainsKey("DeviceInfo") && ViewContext.ModelState["DeviceInfo"]!.Errors.Any())
                                 {
-                                    <span class="text-danger">@ViewContext.ModelState["DeviceInfo"]!.Errors.First().ErrorMessage</span>
+                                    <div class="text-danger mt-1">
+                                        <i class="fas fa-exclamation-circle me-1"></i>@ViewContext.ModelState["DeviceInfo"]!.Errors.First().ErrorMessage
+                                    </div>
                                 }
                             </div>
 
                             <!-- Issue Description -->
-                            <div class="mb-3">
-                                <label for="issueDescription" class="form-label fw-bold">Mô tả tình trạng</label>
+                            <div class="form-group-modern">
+                                <label for="issueDescription">
+                                    <i class="fas fa-clipboard-list me-1"></i>Mô tả tình trạng
+                                </label>
                                 <textarea class="form-control" id="issueDescription" name="issueDescription" rows="4"
                                           placeholder="Mô tả chi tiết tình trạng hư hỏng của thiết bị..."></textarea>
                             </div>
 
                             <!-- Booking Date -->
-                            <div class="mb-3">
-                                <label for="bookingDate" class="form-label fw-bold">Ngày hẹn <span class="text-danger">*</span></label>
+                            <div class="form-group-modern">
+                                <label for="bookingDate">
+                                    <i class="fas fa-calendar-day me-1"></i>Ngày hẹn <span class="required-star">*</span>
+                                </label>
                                 <input type="date" class="form-control" id="bookingDate" name="bookingDate"
                                        min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
                                 @if (ViewContext.ModelState.ContainsKey("BookingDate") && ViewContext.ModelState["BookingDate"]!.Errors.Any())
                                 {
-                                    <span class="text-danger">@ViewContext.ModelState["BookingDate"]!.Errors.First().ErrorMessage</span>
+                                    <div class="text-danger mt-1">
+                                        <i class="fas fa-exclamation-circle me-1"></i>@ViewContext.ModelState["BookingDate"]!.Errors.First().ErrorMessage
+                                    </div>
                                 }
                             </div>
 
                             <!-- Note -->
-                            <div class="mb-3">
-                                <label for="note" class="form-label fw-bold">Ghi chú thêm</label>
+                            <div class="form-group-modern">
+                                <label for="note">
+                                    <i class="fas fa-sticky-note me-1"></i>Ghi chú thêm
+                                </label>
                                 <textarea class="form-control" id="note" name="note" rows="2"
                                           placeholder="Ghi chú thêm nếu có (thời gian thuận tiện, yêu cầu đặc biệt...)"></textarea>
                             </div>
 
-                            <div class="d-flex justify-content-between">
-                                <a asp-controller="RepairService" asp-action="Index" class="btn btn-outline-secondary">
-                                    Quay lại
+                            <!-- Buttons -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 pt-2">
+                                <a asp-controller="RepairService" asp-action="Index" class="btn-back">
+                                    <i class="fas fa-arrow-left me-1"></i> Quay lại
                                 </a>
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-calendar-check"></i> Xác nhận đặt lịch
+                                <button type="submit" class="btn-submit-booking">
+                                    <i class="fas fa-calendar-check me-2"></i>Xác nhận đặt lịch
                                 </button>
                             </div>
                         </form>
-                    }
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 60 });
+    </script>
+}
