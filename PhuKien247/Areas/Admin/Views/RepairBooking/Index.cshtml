@@ -3,15 +3,21 @@
     ViewData["Title"] = "Quản lý lịch sửa chữa";
 }
 
-<h5 class="mb-3">Danh sách lịch sửa chữa</h5>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1"><i class="fas fa-tools me-2" style="color: var(--pk-orange, #FF6B35);"></i>Quản lý lịch sửa chữa</h4>
+        <p class="text-muted mb-0">Theo dõi và cập nhật trạng thái các lịch hẹn sửa chữa</p>
+    </div>
+    <span class="badge bg-primary fs-6">@Model.Count lịch hẹn</span>
+</div>
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff;">
+                        <th class="ps-4">#</th>
                         <th>Khách hàng</th>
                         <th>Dịch vụ</th>
                         <th>Thiết bị</th>
@@ -19,22 +25,38 @@
                         <th>Ngày hẹn</th>
                         <th>Trạng thái</th>
                         <th>Ngày tạo</th>
-                        <th>Cập nhật</th>
+                        <th class="text-center">Cập nhật</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var booking in Model)
                     {
                         <tr>
-                            <td>@booking.Id</td>
-                            <td>@booking.User.FullName</td>
-                            <td>@booking.Service.Name</td>
-                            <td>@booking.DeviceInfo</td>
+                            <td class="ps-4 fw-bold">#@booking.Id</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2"
+                                         style="width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #ff8f65); color: #fff; font-size: 0.85rem;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">@booking.User.FullName</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border" style="font-size: 0.85rem;">
+                                    <i class="fas fa-wrench me-1 text-muted"></i>@booking.Service.Name
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-medium">@booking.DeviceInfo</span>
+                            </td>
                             <td>
                                 @if (!string.IsNullOrEmpty(booking.IssueDescription))
                                 {
-                                    <span title="@booking.IssueDescription">
-                                        @(booking.IssueDescription.Length > 40 ? booking.IssueDescription.Substring(0, 40) + "..." : booking.IssueDescription)
+                                    <span title="@booking.IssueDescription" class="text-muted" style="cursor: help;">
+                                        @(booking.IssueDescription.Length > 35 ? booking.IssueDescription.Substring(0, 35) + "..." : booking.IssueDescription)
                                     </span>
                                 }
                                 else
@@ -42,40 +64,43 @@
                                     <span class="text-muted">-</span>
                                 }
                             </td>
-                            <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <i class="far fa-calendar-alt me-1 text-muted"></i>
+                                @booking.BookingDate.ToString("dd/MM/yyyy")
+                            </td>
                             <td>
                                 @switch (booking.Status)
                                 {
                                     case RepairStatus.ChoXacNhan:
-                                        <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Chờ xác nhận</span>
                                         break;
                                     case RepairStatus.DaTiepNhan:
-                                        <span class="badge bg-info">Đã tiếp nhận</span>
+                                        <span class="badge bg-info"><i class="fas fa-check me-1"></i>Đã tiếp nhận</span>
                                         break;
                                     case RepairStatus.DangSua:
-                                        <span class="badge bg-primary">Đang sửa</span>
+                                        <span class="badge bg-primary"><i class="fas fa-cog fa-spin me-1"></i>Đang sửa</span>
                                         break;
                                     case RepairStatus.HoanThanh:
-                                        <span class="badge bg-success">Hoàn thành</span>
+                                        <span class="badge bg-success"><i class="fas fa-check-double me-1"></i>Hoàn thành</span>
                                         break;
                                     case RepairStatus.DaHuy:
-                                        <span class="badge bg-danger">Đã hủy</span>
+                                        <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Đã hủy</span>
                                         break;
                                 }
                             </td>
-                            <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-muted small">@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                             <td>
                                 <form asp-area="Admin" asp-controller="RepairBooking" asp-action="UpdateStatus" asp-route-id="@booking.Id"
-                                      method="post" class="d-flex gap-1">
-                                    <select name="status" class="form-select form-select-sm" style="width:140px;">
+                                      method="post" class="d-flex gap-1 justify-content-center">
+                                    <select name="status" class="form-select form-select-sm" style="width: 145px; border-radius: 8px;">
                                         <option value="@RepairStatus.ChoXacNhan" selected="@(booking.Status == RepairStatus.ChoXacNhan)">Chờ xác nhận</option>
                                         <option value="@RepairStatus.DaTiepNhan" selected="@(booking.Status == RepairStatus.DaTiepNhan)">Đã tiếp nhận</option>
                                         <option value="@RepairStatus.DangSua" selected="@(booking.Status == RepairStatus.DangSua)">Đang sửa</option>
                                         <option value="@RepairStatus.HoanThanh" selected="@(booking.Status == RepairStatus.HoanThanh)">Hoàn thành</option>
                                         <option value="@RepairStatus.DaHuy" selected="@(booking.Status == RepairStatus.DaHuy)">Đã hủy</option>
                                     </select>
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-check"></i>
+                                    <button type="submit" class="btn btn-sm text-white" style="background: linear-gradient(135deg, #FF6B35, #e55a26); border-radius: 8px;">
+                                        <i class="fas fa-save"></i>
                                     </button>
                                 </form>
                             </td>
@@ -84,7 +109,10 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">Chưa có lịch sửa chữa nào</td>
+                            <td colspan="9" class="text-center py-5">
+                                <i class="fas fa-calendar-times fa-3x text-muted mb-3 d-block"></i>
+                                <p class="text-muted mb-0">Chưa có lịch sửa chữa nào</p>
+                            </td>
                         </tr>
                     }
                 </tbody>

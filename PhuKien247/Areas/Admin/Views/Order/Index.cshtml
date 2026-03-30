@@ -1,75 +1,158 @@
 @model List<Order>
 @{
-    ViewData["Title"] = "Quản lý đơn hàng";
+    ViewData["Title"] = "Quan ly don hang";
 }
 
-<h5 class="mb-3">Danh sách đơn hàng</h5>
+@section Styles {
+<style>
+    .order-table th {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b7280;
+        font-weight: 600;
+        border-bottom: 2px solid #f3f4f6;
+        padding: 14px 16px;
+        white-space: nowrap;
+    }
+    .order-table td {
+        vertical-align: middle;
+        padding: 12px 16px;
+        font-size: 0.88rem;
+    }
+    .order-table tbody tr {
+        transition: background 0.15s;
+    }
+    .order-table tbody tr:nth-child(even) {
+        background: #fafbfc;
+    }
+    .order-table tbody tr:hover {
+        background: #fff7ed;
+    }
+    .status-badge {
+        font-size: 0.78rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .filter-select {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 8px 14px;
+        font-size: 0.88rem;
+        min-width: 180px;
+        transition: border-color 0.2s;
+    }
+    .filter-select:focus {
+        border-color: #FF6B35;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+    }
+    .btn-detail {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        border: 1px solid #FF6B35;
+        color: #FF6B35;
+        background: transparent;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .btn-detail:hover {
+        background: #FF6B35;
+        color: #fff;
+    }
+</style>
+}
 
-<div class="card border-0 shadow-sm">
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Quan ly don hang</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">@Model.Count don hang trong he thong</p>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card mb-4" style="border-radius:12px;">
+    <div class="card-body py-3">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <span class="fw-semibold text-muted" style="font-size:0.85rem;"><i class="fas fa-filter me-1"></i> Loc:</span>
+            <select id="statusFilter" class="filter-select" onchange="filterByStatus()">
+                <option value="">Tat ca trang thai</option>
+                <option value="Cho xac nhan">Cho xac nhan</option>
+                <option value="Da xac nhan">Da xac nhan</option>
+                <option value="Dang giao">Dang giao</option>
+                <option value="Hoan thanh">Hoan thanh</option>
+                <option value="Da huy">Da huy</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="card" style="border-radius:14px;">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+            <table class="table order-table mb-0" id="orderTable">
+                <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Khách hàng</th>
-                        <th>Số điện thoại</th>
-                        <th>Địa chỉ giao</th>
-                        <th>Tổng tiền</th>
-                        <th>Thanh toán</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày đặt</th>
-                        <th>Thao tác</th>
+                        <th>Ma DH</th>
+                        <th>Khach hang</th>
+                        <th>So dien thoai</th>
+                        <th>Tong tien</th>
+                        <th>Thanh toan</th>
+                        <th>Trang thai</th>
+                        <th>Ngay dat</th>
+                        <th>Thao tac</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var order in Model)
                     {
                         <tr>
-                            <td>@order.Id</td>
+                            <td><strong>#@order.Id</strong></td>
                             <td>@order.User.FullName</td>
-                            <td>@order.PhoneNumber</td>
-                            <td>
-                                <span title="@order.ShippingAddress">
-                                    @(order.ShippingAddress.Length > 30 ? order.ShippingAddress.Substring(0, 30) + "..." : order.ShippingAddress)
-                                </span>
-                            </td>
-                            <td><strong>@order.TotalAmount.ToString("N0") đ</strong></td>
+                            <td class="text-muted">@order.PhoneNumber</td>
+                            <td><strong style="color:#FF6B35;">@order.TotalAmount.ToString("N0") d</strong></td>
                             <td>
                                 @if (order.PaymentMethod == PaymentMethod.COD)
                                 {
-                                    <span class="badge bg-secondary">COD</span>
+                                    <span class="badge" style="background:#f3f4f6;color:#6b7280;border-radius:20px;padding:5px 10px;">COD</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-primary">Chuyển khoản</span>
+                                    <span class="badge" style="background:#e0f2fe;color:#0284c7;border-radius:20px;padding:5px 10px;">Chuyen khoan</span>
                                 }
                             </td>
                             <td>
                                 @switch (order.Status)
                                 {
                                     case OrderStatus.ChoXacNhan:
-                                        <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                        <span class="status-badge badge bg-warning text-dark">Cho xac nhan</span>
                                         break;
                                     case OrderStatus.DaXacNhan:
-                                        <span class="badge bg-info">Đã xác nhận</span>
+                                        <span class="status-badge badge bg-info">Da xac nhan</span>
                                         break;
                                     case OrderStatus.DangGiao:
-                                        <span class="badge bg-primary">Đang giao</span>
+                                        <span class="status-badge badge bg-primary">Dang giao</span>
                                         break;
                                     case OrderStatus.HoanThanh:
-                                        <span class="badge bg-success">Hoàn thành</span>
+                                        <span class="status-badge badge bg-success">Hoan thanh</span>
                                         break;
                                     case OrderStatus.DaHuy:
-                                        <span class="badge bg-danger">Đã hủy</span>
+                                        <span class="status-badge badge bg-danger">Da huy</span>
                                         break;
                                 }
                             </td>
-                            <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-muted">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                             <td>
                                 <a asp-area="Admin" asp-controller="Order" asp-action="Details" asp-route-id="@order.Id"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye"></i> Chi tiết
+                                   class="btn-detail">
+                                    <i class="fas fa-eye"></i> Chi tiet
                                 </a>
                             </td>
                         </tr>
@@ -77,7 +160,10 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">Chưa có đơn hàng nào</td>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="fas fa-receipt fa-2x mb-2 d-block" style="opacity:0.3;"></i>
+                                Chua co don hang nao
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -85,3 +171,23 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    function filterByStatus() {
+        var filter = document.getElementById('statusFilter').value.toLowerCase();
+        var rows = document.querySelectorAll('#orderTable tbody tr');
+        rows.forEach(function(row) {
+            if (!filter) {
+                row.style.display = '';
+                return;
+            }
+            var statusCell = row.querySelector('.status-badge');
+            if (statusCell) {
+                var statusText = statusCell.textContent.trim().toLowerCase();
+                row.style.display = statusText.indexOf(filter) > -1 ? '' : 'none';
+            }
+        });
+    }
+</script>
+}

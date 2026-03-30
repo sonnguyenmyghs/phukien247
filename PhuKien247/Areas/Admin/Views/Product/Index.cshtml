@@ -1,92 +1,225 @@
 @model List<Product>
 @{
-    ViewData["Title"] = "Quản lý sản phẩm";
+    ViewData["Title"] = "Quan ly san pham";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Danh sách sản phẩm</h5>
-    <a asp-area="Admin" asp-controller="Product" asp-action="Create" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Thêm sản phẩm
+@section Styles {
+<style>
+    .product-table th {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b7280;
+        font-weight: 600;
+        border-bottom: 2px solid #f3f4f6;
+        padding: 14px 16px;
+        white-space: nowrap;
+    }
+    .product-table td {
+        vertical-align: middle;
+        padding: 12px 16px;
+        font-size: 0.88rem;
+    }
+    .product-table tbody tr {
+        transition: background 0.15s;
+    }
+    .product-table tbody tr:nth-child(even) {
+        background: #fafbfc;
+    }
+    .product-table tbody tr:hover {
+        background: #fff7ed;
+    }
+    .product-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 2px solid #f3f4f6;
+    }
+    .product-thumb-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d1d5db;
+    }
+    .stock-badge {
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .btn-action {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+        border: 1px solid;
+        background: transparent;
+        cursor: pointer;
+    }
+    .btn-action-edit { color: #f59e0b; border-color: #fde68a; }
+    .btn-action-edit:hover { background: #f59e0b; color: #fff; border-color: #f59e0b; }
+    .btn-action-delete { color: #ef4444; border-color: #fecaca; }
+    .btn-action-delete:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+    .search-bar input {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 10px 16px 10px 40px;
+        font-size: 0.88rem;
+        transition: border-color 0.2s;
+    }
+    .search-bar input:focus {
+        border-color: #FF6B35;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+    }
+    .search-bar .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+</style>
+}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Quan ly san pham</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">@Model.Count san pham trong he thong</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Product" asp-action="Create"
+       class="btn btn-primary d-flex align-items-center gap-2"
+       style="background:#FF6B35;border-color:#FF6B35;border-radius:10px;padding:10px 20px;font-weight:600;">
+        <i class="fas fa-plus"></i> Them san pham
     </a>
 </div>
 
-<div class="card border-0 shadow-sm">
+<!-- Search/Filter Bar -->
+<div class="card mb-4" style="border-radius:12px;">
+    <div class="card-body py-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="search-bar position-relative">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tim kiem san pham..." onkeyup="filterProducts()" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Table -->
+<div class="card" style="border-radius:14px;">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+            <table class="table product-table mb-0" id="productTable">
+                <thead>
                     <tr>
                         <th>#</th>
-                        <th>Hình ảnh</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Danh mục</th>
-                        <th>Thương hiệu</th>
-                        <th>Giá</th>
-                        <th>Giá KM</th>
-                        <th>Tồn kho</th>
-                        <th>Trạng thái</th>
-                        <th>Thao tác</th>
+                        <th>Hinh anh</th>
+                        <th>Ten san pham</th>
+                        <th>Danh muc</th>
+                        <th>Thuong hieu</th>
+                        <th>Gia</th>
+                        <th>Ton kho</th>
+                        <th>Trang thai</th>
+                        <th>Thao tac</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var product in Model)
                     {
                         <tr>
-                            <td>@product.Id</td>
+                            <td><strong class="text-muted">@product.Id</strong></td>
                             <td>
                                 @if (!string.IsNullOrEmpty(product.ImageUrl))
                                 {
-                                    <img src="@product.ImageUrl" alt="@product.Name" style="width:50px;height:50px;object-fit:cover;" class="rounded" />
+                                    <img src="@product.ImageUrl" alt="@product.Name" class="product-thumb"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                                    <div class="product-thumb-placeholder" style="display:none;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <span class="text-muted"><i class="fas fa-image"></i></span>
+                                    <div class="product-thumb-placeholder">
+                                        <i class="fas fa-image"></i>
+                                    </div>
                                 }
                             </td>
-                            <td>@product.Name</td>
+                            <td><strong>@product.Name</strong></td>
                             <td>@product.Category.Name</td>
                             <td>@product.Brand.Name</td>
-                            <td>@product.Price.ToString("N0") đ</td>
                             <td>
                                 @if (product.SalePrice.HasValue)
                                 {
-                                    <span class="text-danger">@product.SalePrice.Value.ToString("N0") đ</span>
+                                    <div>
+                                        <span style="text-decoration:line-through;color:#9ca3af;font-size:0.8rem;">@product.Price.ToString("N0") d</span><br/>
+                                        <strong style="color:#ef4444;">@product.SalePrice.Value.ToString("N0") d</strong>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">-</span>
+                                    <strong>@product.Price.ToString("N0") d</strong>
                                 }
                             </td>
-                            <td>@product.Stock</td>
+                            <td>
+                                @if (product.Stock > 10)
+                                {
+                                    <span class="stock-badge" style="background:#dcfce7;color:#16a34a;">@product.Stock</span>
+                                }
+                                else if (product.Stock > 0)
+                                {
+                                    <span class="stock-badge" style="background:#fef9c3;color:#ca8a04;">@product.Stock</span>
+                                }
+                                else
+                                {
+                                    <span class="stock-badge" style="background:#fef2f2;color:#ef4444;">Het hang</span>
+                                }
+                            </td>
                             <td>
                                 @if (product.IsActive)
                                 {
-                                    <span class="badge bg-success">Đang bán</span>
+                                    <span class="badge bg-success" style="border-radius:20px;padding:5px 12px;">Dang ban</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">Ẩn</span>
+                                    <span class="badge bg-secondary" style="border-radius:20px;padding:5px 12px;">An</span>
                                 }
                             </td>
                             <td>
-                                <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id"
-                                   class="btn btn-sm btn-outline-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id"
-                                      method="post" class="d-inline"
-                                      onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                <div class="d-flex gap-1">
+                                    <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id"
+                                       class="btn-action btn-action-edit" title="Chinh sua">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <form asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id"
+                                          method="post" class="d-inline"
+                                          onsubmit="return confirm('Ban co chac muon xoa san pham nay?');">
+                                        <button type="submit" class="btn-action btn-action-delete" title="Xoa">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-4">Chưa có sản phẩm nào</td>
+                            <td colspan="9" class="text-center text-muted py-5">
+                                <i class="fas fa-box-open fa-2x mb-2 d-block" style="opacity:0.3;"></i>
+                                Chua co san pham nao
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -94,3 +227,16 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    function filterProducts() {
+        var input = document.getElementById('searchInput').value.toLowerCase();
+        var rows = document.querySelectorAll('#productTable tbody tr');
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            row.style.display = text.indexOf(input) > -1 ? '' : 'none';
+        });
+    }
+</script>
+}

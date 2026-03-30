@@ -1,51 +1,130 @@
 @model Category
 @{
-    ViewData["Title"] = "Sửa danh mục";
+    ViewData["Title"] = "Sua danh muc";
 }
 
+@section Styles {
+<style>
+    .form-card {
+        border-radius: 14px;
+        background: #fff;
+    }
+    .form-card .card-header {
+        background: none;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 20px 24px;
+    }
+    .form-card .card-body {
+        padding: 24px;
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+        border-color: #FF6B35;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+    }
+    .btn-save {
+        background: #FF6B35;
+        border-color: #FF6B35;
+        border-radius: 10px;
+        padding: 10px 28px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .btn-save:hover {
+        background: #e85a24;
+        border-color: #e85a24;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+    }
+    .btn-cancel {
+        border-radius: 10px;
+        padding: 10px 28px;
+        font-weight: 600;
+        border: 1px solid #d1d5db;
+        color: #6b7280;
+        background: #fff;
+    }
+    .btn-cancel:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+    .current-image {
+        border-radius: 12px;
+        border: 2px solid #f3f4f6;
+        max-width: 200px;
+        max-height: 200px;
+        object-fit: cover;
+    }
+</style>
+}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Sua danh muc</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Cap nhat thong tin danh muc #@Model.Id</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-cancel">
+        <i class="fas fa-arrow-left me-1"></i> Quay lai
+    </a>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-edit"></i> Sửa danh mục</h5>
+    <div class="col-lg-7">
+        <div class="card form-card">
+            <div class="card-header">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-layer-group me-2" style="color:#FF6B35;"></i>Thong tin danh muc</h6>
             </div>
             <div class="card-body">
                 <form asp-area="Admin" asp-controller="Category" asp-action="Edit" asp-route-id="@Model.Id" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius:10px;display:none;"></div>
                     <input type="hidden" asp-for="Id" />
 
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                        <label asp-for="Name" class="form-label">Ten danh muc <span class="text-danger">*</span></label>
                         <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <span asp-validation-for="Name" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Mô tả</label>
+                        <label asp-for="Description" class="form-label">Mo ta</label>
                         <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <span asp-validation-for="Description" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
+                        <label asp-for="ImageUrl" class="form-label">URL hinh anh</label>
                         <input asp-for="ImageUrl" class="form-control" />
-                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        <span asp-validation-for="ImageUrl" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
 
                     @if (!string.IsNullOrEmpty(Model.ImageUrl))
                     {
-                        <div class="mb-3">
-                            <label class="form-label">Hình ảnh hiện tại</label><br />
-                            <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width:200px;max-height:200px;" class="rounded border" />
+                        <div class="mb-4 text-center p-3" style="background:#f9fafb;border-radius:12px;">
+                            <label class="form-label d-block text-start">Hinh anh hien tai</label>
+                            <img src="@Model.ImageUrl" alt="@Model.Name" class="current-image"
+                                 onerror="this.parentElement.style.display='none';" />
                         </div>
                     }
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Cập nhật
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary btn-save">
+                            <i class="fas fa-save me-1"></i> Cap nhat
                         </button>
-                        <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Quay lại
+                        <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-cancel">
+                            Huy bo
                         </a>
                     </div>
                 </form>

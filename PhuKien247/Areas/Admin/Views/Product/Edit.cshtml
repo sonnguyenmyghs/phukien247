@@ -1,104 +1,215 @@
 @model Product
 @{
-    ViewData["Title"] = "Sửa sản phẩm";
+    ViewData["Title"] = "Sua san pham";
 }
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-edit"></i> Sửa sản phẩm</h5>
-            </div>
-            <div class="card-body">
-                <form asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="CreatedAt" />
+@section Styles {
+<style>
+    .form-card {
+        border-radius: 14px;
+        background: #fff;
+    }
+    .form-card .card-header {
+        background: none;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 20px 24px;
+    }
+    .form-card .card-body {
+        padding: 24px;
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #FF6B35;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+    }
+    .btn-save {
+        background: #FF6B35;
+        border-color: #FF6B35;
+        border-radius: 10px;
+        padding: 10px 28px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .btn-save:hover {
+        background: #e85a24;
+        border-color: #e85a24;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+    }
+    .btn-cancel {
+        border-radius: 10px;
+        padding: 10px 28px;
+        font-weight: 600;
+        border: 1px solid #d1d5db;
+        color: #6b7280;
+        background: #fff;
+    }
+    .btn-cancel:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #9ca3af;
+        font-weight: 600;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .current-image {
+        border-radius: 12px;
+        border: 2px solid #f3f4f6;
+        max-width: 100%;
+        max-height: 180px;
+        object-fit: cover;
+    }
+</style>
+}
 
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Sua san pham</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Cap nhat thong tin san pham #@Model.Id</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-cancel">
+        <i class="fas fa-arrow-left me-1"></i> Quay lai
+    </a>
+</div>
+
+<form asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="border-radius:10px;display:none;"></div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedAt" />
+
+    <div class="row g-4">
+        <!-- Left Column - Main Info -->
+        <div class="col-lg-8">
+            <div class="card form-card">
+                <div class="card-header">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2" style="color:#FF6B35;"></i>Thong tin co ban</h6>
+                </div>
+                <div class="card-body">
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <label asp-for="Name" class="form-label">Ten san pham <span class="text-danger">*</span></label>
                         <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <span asp-validation-for="Name" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Mô tả</label>
+                        <label asp-for="Description" class="form-label">Mo ta</label>
                         <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <span asp-validation-for="Description" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Price" class="form-label">Giá <span class="text-danger">*</span></label>
+                    <div class="section-title mt-4">Gia & Ton kho</div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Price" class="form-label">Gia ban <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input asp-for="Price" class="form-control" />
-                                <span class="input-group-text">đ</span>
+                                <span class="input-group-text" style="border-radius:0 10px 10px 0;background:#f9fafb;font-size:0.85rem;">d</span>
                             </div>
-                            <span asp-validation-for="Price" class="text-danger"></span>
+                            <span asp-validation-for="Price" class="text-danger" style="font-size:0.82rem;"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="SalePrice" class="form-label">Giá khuyến mãi</label>
+                        <div class="col-md-4">
+                            <label asp-for="SalePrice" class="form-label">Gia khuyen mai</label>
                             <div class="input-group">
                                 <input asp-for="SalePrice" class="form-control" />
-                                <span class="input-group-text">đ</span>
+                                <span class="input-group-text" style="border-radius:0 10px 10px 0;background:#f9fafb;font-size:0.85rem;">d</span>
                             </div>
-                            <span asp-validation-for="SalePrice" class="text-danger"></span>
+                            <span asp-validation-for="SalePrice" class="text-danger" style="font-size:0.82rem;"></span>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="CategoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
-                            <select asp-for="CategoryId" asp-items="@ViewBag.Categories" class="form-select">
-                                <option value="">-- Chọn danh mục --</option>
-                            </select>
-                            <span asp-validation-for="CategoryId" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="BrandId" class="form-label">Thương hiệu <span class="text-danger">*</span></label>
-                            <select asp-for="BrandId" asp-items="@ViewBag.Brands" class="form-select">
-                                <option value="">-- Chọn thương hiệu --</option>
-                            </select>
-                            <span asp-validation-for="BrandId" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Stock" class="form-label">Số lượng tồn kho</label>
+                        <div class="col-md-4">
+                            <label asp-for="Stock" class="form-label">Ton kho</label>
                             <input asp-for="Stock" class="form-control" />
-                            <span asp-validation-for="Stock" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
-                            <input asp-for="ImageUrl" class="form-control" />
-                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            <span asp-validation-for="Stock" class="text-danger" style="font-size:0.82rem;"></span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Right Column - Category, Brand, Image -->
+        <div class="col-lg-4">
+            <div class="card form-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-folder me-2" style="color:#FF6B35;"></i>Phan loai</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="CategoryId" class="form-label">Danh muc <span class="text-danger">*</span></label>
+                        <select asp-for="CategoryId" asp-items="@ViewBag.Categories" class="form-select">
+                            <option value="">-- Chon danh muc --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger" style="font-size:0.82rem;"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="BrandId" class="form-label">Thuong hieu <span class="text-danger">*</span></label>
+                        <select asp-for="BrandId" asp-items="@ViewBag.Brands" class="form-select">
+                            <option value="">-- Chon thuong hieu --</option>
+                        </select>
+                        <span asp-validation-for="BrandId" class="text-danger" style="font-size:0.82rem;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card form-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-image me-2" style="color:#FF6B35;"></i>Hinh anh</h6>
+                </div>
+                <div class="card-body">
                     @if (!string.IsNullOrEmpty(Model.ImageUrl))
                     {
-                        <div class="mb-3">
-                            <label class="form-label">Hình ảnh hiện tại</label><br />
-                            <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width:200px;max-height:200px;" class="rounded border" />
+                        <div class="mb-3 text-center">
+                            <img src="@Model.ImageUrl" alt="@Model.Name" class="current-image"
+                                 onerror="this.style.display='none';" />
                         </div>
                     }
-
-                    <div class="mb-3 form-check">
-                        <input asp-for="IsActive" class="form-check-input" />
-                        <label asp-for="IsActive" class="form-check-label">Đang kinh doanh</label>
+                    <div class="mb-0">
+                        <label asp-for="ImageUrl" class="form-label">URL hinh anh</label>
+                        <input asp-for="ImageUrl" class="form-control" />
+                        <span asp-validation-for="ImageUrl" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
+                </div>
+            </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Cập nhật
-                        </button>
-                        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Quay lại
-                        </a>
+            <div class="card form-card">
+                <div class="card-header">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-toggle-on me-2" style="color:#FF6B35;"></i>Trang thai</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch">
+                        <input asp-for="IsActive" class="form-check-input" style="width:3em;height:1.5em;" />
+                        <label asp-for="IsActive" class="form-check-label fw-semibold" style="margin-left:8px;">Dang kinh doanh</label>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Submit -->
+    <div class="d-flex gap-3 mt-4">
+        <button type="submit" class="btn btn-primary btn-save">
+            <i class="fas fa-save me-1"></i> Cap nhat
+        </button>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-cancel">
+            Huy bo
+        </a>
+    </div>
+</form>

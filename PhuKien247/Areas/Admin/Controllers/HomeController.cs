@@ -31,6 +31,17 @@ public class HomeController : Controller
             .Where(r => r.Status == RepairStatus.ChoXacNhan)
             .CountAsync();
 
+        // Orders by status for doughnut chart
+        var ordersByStatus = new Dictionary<string, int>
+        {
+            { "ChoXacNhan", await _context.Orders.CountAsync(o => o.Status == OrderStatus.ChoXacNhan) },
+            { "DaXacNhan", await _context.Orders.CountAsync(o => o.Status == OrderStatus.DaXacNhan) },
+            { "DangGiao", await _context.Orders.CountAsync(o => o.Status == OrderStatus.DangGiao) },
+            { "HoanThanh", await _context.Orders.CountAsync(o => o.Status == OrderStatus.HoanThanh) },
+            { "DaHuy", await _context.Orders.CountAsync(o => o.Status == OrderStatus.DaHuy) }
+        };
+        ViewBag.OrdersByStatus = ordersByStatus;
+
         var recentOrders = await _context.Orders
             .Include(o => o.User)
             .OrderByDescending(o => o.CreatedAt)
