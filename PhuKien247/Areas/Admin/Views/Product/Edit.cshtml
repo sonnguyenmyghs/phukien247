@@ -1,6 +1,6 @@
 @model Product
 @{
-    ViewData["Title"] = "Sua san pham";
+    ViewData["Title"] = "Sua sản phẩm";
 }
 
 @section Styles {
@@ -83,11 +83,11 @@
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h5 class="fw-bold mb-1" style="color:#1f2937;">Sua san pham</h5>
-        <p class="text-muted mb-0" style="font-size:0.85rem;">Cap nhat thong tin san pham #@Model.Id</p>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Sua sản phẩm</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Cập nhật thong tin sản phẩm #@Model.Id</p>
     </div>
     <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-cancel">
-        <i class="fas fa-arrow-left me-1"></i> Quay lai
+        <i class="fas fa-arrow-left me-1"></i> Quay lại
     </a>
 </div>
 
@@ -105,18 +105,18 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Ten san pham <span class="text-danger">*</span></label>
+                        <label asp-for="Name" class="form-label">Ten sản phẩm <span class="text-danger">*</span></label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Mo ta</label>
+                        <label asp-for="Description" class="form-label">Mô tả</label>
                         <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                         <span asp-validation-for="Description" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
 
-                    <div class="section-title mt-4">Gia & Ton kho</div>
+                    <div class="section-title mt-4">Gia & Tồn kho</div>
 
                     <div class="row g-3">
                         <div class="col-md-4">
@@ -136,7 +136,7 @@
                             <span asp-validation-for="SalePrice" class="text-danger" style="font-size:0.82rem;"></span>
                         </div>
                         <div class="col-md-4">
-                            <label asp-for="Stock" class="form-label">Ton kho</label>
+                            <label asp-for="Stock" class="form-label">Tồn kho</label>
                             <input asp-for="Stock" class="form-control" />
                             <span asp-validation-for="Stock" class="text-danger" style="font-size:0.82rem;"></span>
                         </div>
@@ -153,16 +153,16 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label asp-for="CategoryId" class="form-label">Danh muc <span class="text-danger">*</span></label>
+                        <label asp-for="CategoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
                         <select asp-for="CategoryId" asp-items="@ViewBag.Categories" class="form-select">
-                            <option value="">-- Chon danh muc --</option>
+                            <option value="">-- Chon danh mục --</option>
                         </select>
                         <span asp-validation-for="CategoryId" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
                     <div class="mb-0">
-                        <label asp-for="BrandId" class="form-label">Thuong hieu <span class="text-danger">*</span></label>
+                        <label asp-for="BrandId" class="form-label">Thương hiệu <span class="text-danger">*</span></label>
                         <select asp-for="BrandId" asp-items="@ViewBag.Brands" class="form-select">
-                            <option value="">-- Chon thuong hieu --</option>
+                            <option value="">-- Chon thương hiệu --</option>
                         </select>
                         <span asp-validation-for="BrandId" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
@@ -171,7 +171,7 @@
 
             <div class="card form-card mb-4">
                 <div class="card-header">
-                    <h6 class="mb-0 fw-bold"><i class="fas fa-image me-2" style="color:#FF6B35;"></i>Hinh anh</h6>
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-image me-2" style="color:#FF6B35;"></i>Hình ảnh</h6>
                 </div>
                 <div class="card-body">
                     @if (!string.IsNullOrEmpty(Model.ImageUrl))
@@ -182,7 +182,7 @@
                         </div>
                     }
                     <div class="mb-0">
-                        <label asp-for="ImageUrl" class="form-label">URL hinh anh</label>
+                        <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
                         <input asp-for="ImageUrl" class="form-control" />
                         <span asp-validation-for="ImageUrl" class="text-danger" style="font-size:0.82rem;"></span>
                     </div>
@@ -191,7 +191,7 @@
 
             <div class="card form-card">
                 <div class="card-header">
-                    <h6 class="mb-0 fw-bold"><i class="fas fa-toggle-on me-2" style="color:#FF6B35;"></i>Trang thai</h6>
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-toggle-on me-2" style="color:#FF6B35;"></i>Trạng thái</h6>
                 </div>
                 <div class="card-body">
                     <div class="form-check form-switch">
@@ -206,10 +206,10 @@
     <!-- Submit -->
     <div class="d-flex gap-3 mt-4">
         <button type="submit" class="btn btn-primary btn-save">
-            <i class="fas fa-save me-1"></i> Cap nhat
+            <i class="fas fa-save me-1"></i> Cập nhật
         </button>
         <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-cancel">
-            Huy bo
+            Hủy bo
         </a>
     </div>
 </form>

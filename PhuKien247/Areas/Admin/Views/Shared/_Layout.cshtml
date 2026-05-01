@@ -390,82 +390,82 @@
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-brand">
             <h4><i class="fas fa-mobile-alt"></i> PhuKien247</h4>
-            <small>Trang quan tri</small>
+            <small>Trang quản trị</small>
         </div>
 
         <nav class="sidebar-nav">
-            <div class="nav-label">Menu chinh</div>
+            <div class="nav-label">Menu chính</div>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
                asp-area="Admin" asp-controller="Home" asp-action="Index">
                 <i class="fas fa-chart-pie"></i> Dashboard
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" ? "active" : "")"
                asp-area="Admin" asp-controller="Product" asp-action="Index">
-                <i class="fas fa-box-open"></i> San pham
+                <i class="fas fa-box-open"></i> Sản phẩm
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active" : "")"
                asp-area="Admin" asp-controller="Category" asp-action="Index">
-                <i class="fas fa-layer-group"></i> Danh muc
+                <i class="fas fa-layer-group"></i> Danh mục
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Brand" ? "active" : "")"
                asp-area="Admin" asp-controller="Brand" asp-action="Index">
-                <i class="fas fa-trademark"></i> Thuong hieu
+                <i class="fas fa-trademark"></i> Thương hiệu
             </a>
 
-            <div class="nav-label" style="margin-top:8px;">Giao dich</div>
+            <div class="nav-label" style="margin-top:8px;">Giao dịch</div>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Order" ? "active" : "")"
                asp-area="Admin" asp-controller="Order" asp-action="Index">
-                <i class="fas fa-receipt"></i> Don hang
+                <i class="fas fa-receipt"></i> Đơn hàng
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "RepairBooking" ? "active" : "")"
                asp-area="Admin" asp-controller="RepairBooking" asp-action="Index">
-                <i class="fas fa-screwdriver-wrench"></i> Lich sua chua
+                <i class="fas fa-screwdriver-wrench"></i> Lịch sửa chữa
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "RepairService" ? "active" : "")"
                asp-area="Admin" asp-controller="RepairService" asp-action="Index">
-                <i class="fas fa-wrench"></i> Dich vu sua chua
+                <i class="fas fa-wrench"></i> Dịch vụ sửa chữa
             </a>
 
-            <div class="nav-label" style="margin-top:8px;">Nguoi dung</div>
+            <div class="nav-label" style="margin-top:8px;">Người dùng</div>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "User" ? "active" : "")"
                asp-area="Admin" asp-controller="User" asp-action="Index">
-                <i class="fas fa-users"></i> Khach hang
+                <i class="fas fa-users"></i> Khách hàng
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Review" ? "active" : "")"
                asp-area="Admin" asp-controller="Review" asp-action="Index">
-                <i class="fas fa-star"></i> Danh gia
+                <i class="fas fa-star"></i> Đánh giá
             </a>
 
-            <div class="nav-label" style="margin-top:8px;">Bao cao</div>
+            <div class="nav-label" style="margin-top:8px;">Báo cáo</div>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "Revenue" ? "active" : "")"
                asp-area="Admin" asp-controller="Report" asp-action="Revenue">
                 <i class="fas fa-chart-line"></i> Doanh thu
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "TopProducts" ? "active" : "")"
                asp-area="Admin" asp-controller="Report" asp-action="TopProducts">
-                <i class="fas fa-trophy"></i> Top san pham
+                <i class="fas fa-trophy"></i> Top sản phẩm
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "TopCustomers" ? "active" : "")"
                asp-area="Admin" asp-controller="Report" asp-action="TopCustomers">
-                <i class="fas fa-crown"></i> Top khach hang
+                <i class="fas fa-crown"></i> Top khách hàng
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "RevenueByCategory" ? "active" : "")"
                asp-area="Admin" asp-controller="Report" asp-action="RevenueByCategory">
-                <i class="fas fa-chart-pie"></i> DT theo danh muc
+                <i class="fas fa-chart-pie"></i> DT theo danh mục
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "LowStock" ? "active" : "")"
                asp-area="Admin" asp-controller="Report" asp-action="LowStock">
-                <i class="fas fa-exclamation-triangle"></i> Ton kho thap
+                <i class="fas fa-exclamation-triangle"></i> Tồn kho thấp
             </a>
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "TopServices" ? "active" : "")"
                asp-area="Admin" asp-controller="Report" asp-action="TopServices">
-                <i class="fas fa-tools"></i> Top dich vu
+                <i class="fas fa-tools"></i> Top dịch vụ
             </a>
         </nav>
 
         <div class="sidebar-footer">
             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                <i class="fas fa-home"></i> Ve trang chu
+                <i class="fas fa-home"></i> Về trang chủ
             </a>
         </div>
     </aside>
@@ -485,7 +485,7 @@
                 </nav>
             </div>
             <div class="topbar-right">
-                <button class="topbar-notification" title="Thong bao">
+                <button class="topbar-notification" title="Thông báo">
                     <i class="fas fa-bell"></i>
                     <span class="badge-dot"></span>
                 </button>
@@ -500,7 +500,7 @@
                 </div>
                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
                     <button type="submit" class="btn-admin-logout">
-                        <i class="fas fa-sign-out-alt"></i> Dang xuat
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
                     </button>
                 </form>
             </div>

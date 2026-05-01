@@ -98,13 +98,13 @@
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h5 class="fw-bold mb-1" style="color:#1f2937;">Quan ly san pham</h5>
-        <p class="text-muted mb-0" style="font-size:0.85rem;">@Model.Count san pham trong he thong</p>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Quản lý sản phẩm</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">@Model.Count sản phẩm trong he thong</p>
     </div>
     <a asp-area="Admin" asp-controller="Product" asp-action="Create"
        class="btn btn-primary d-flex align-items-center gap-2"
        style="background:#FF6B35;border-color:#FF6B35;border-radius:10px;padding:10px 20px;font-weight:600;">
-        <i class="fas fa-plus"></i> Them san pham
+        <i class="fas fa-plus"></i> Them sản phẩm
     </a>
 </div>
 
@@ -173,13 +173,13 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Hinh anh</th>
-                        <th>Ten san pham</th>
-                        <th>Danh muc</th>
-                        <th>Thuong hieu</th>
+                        <th>Hình ảnh</th>
+                        <th>Ten sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th>Thương hiệu</th>
                         <th>Gia</th>
-                        <th>Ton kho</th>
-                        <th>Trang thai</th>
+                        <th>Tồn kho</th>
+                        <th>Trạng thái</th>
                         <th>Thao tac</th>
                     </tr>
                 </thead>
@@ -211,13 +211,13 @@
                                 @if (product.SalePrice.HasValue)
                                 {
                                     <div>
-                                        <span style="text-decoration:line-through;color:#9ca3af;font-size:0.8rem;">@product.Price.ToString("N0") d</span><br/>
-                                        <strong style="color:#ef4444;">@product.SalePrice.Value.ToString("N0") d</strong>
+                                        <span style="text-decoration:line-through;color:#9ca3af;font-size:0.8rem;">@product.Price.ToString("N0") đ</span><br/>
+                                        <strong style="color:#ef4444;">@product.SalePrice.Value.ToString("N0") đ</strong>
                                     </div>
                                 }
                                 else
                                 {
-                                    <strong>@product.Price.ToString("N0") d</strong>
+                                    <strong>@product.Price.ToString("N0") đ</strong>
                                 }
                             </td>
                             <td>
@@ -247,13 +247,13 @@
                             <td>
                                 <div class="d-flex gap-1">
                                     <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id"
-                                       class="btn-action btn-action-edit" title="Chinh sua">
+                                       class="btn-action btn-action-edit" title="Chỉnh sửa">
                                         <i class="fas fa-pen"></i>
                                     </a>
                                     <form asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id"
                                           method="post" class="d-inline"
-                                          onsubmit="return confirm('Ban co chac muon xoa san pham nay?');">
-                                        <button type="submit" class="btn-action btn-action-delete" title="Xoa">
+                                          onsubmit="return confirm('Ban co chac muon xoa sản phẩm nay?');">
+                                        <button type="submit" class="btn-action btn-action-delete" title="Xóa">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
@@ -266,7 +266,7 @@
                         <tr>
                             <td colspan="9" class="text-center text-muted py-5">
                                 <i class="fas fa-box-open fa-2x mb-2 d-block" style="opacity:0.3;"></i>
-                                Chua co san pham nao
+                                Chưa có sản phẩm nao
                             </td>
                         </tr>
                     }

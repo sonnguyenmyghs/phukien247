@@ -99,8 +99,8 @@
 
 <!-- Welcome -->
 <div class="mb-4">
-    <h4 class="fw-bold" style="color:#1f2937;">Xin chao, Quan tri vien!</h4>
-    <p class="text-muted mb-0">Tong quan hoat dong cua he thong hom nay.</p>
+    <h4 class="fw-bold" style="color:#1f2937;">Xin chao, Quản trị vien!</h4>
+    <p class="text-muted mb-0">Tong quan hoat đồng cua he thong hom nay.</p>
 </div>
 
 <!-- Stat Cards -->
@@ -109,31 +109,31 @@
         <div class="stat-card bg-gradient-blue">
             <i class="fas fa-box-open stat-icon"></i>
             <div class="stat-number">@ViewBag.TotalProducts</div>
-            <div class="stat-label">Tong san pham</div>
-            <div class="stat-trend"><i class="fas fa-arrow-up me-1"></i>San pham dang ban</div>
+            <div class="stat-label">Tong sản phẩm</div>
+            <div class="stat-trend"><i class="fas fa-arrow-up me-1"></i>Sản phẩm dang ban</div>
         </div>
     </div>
     <div class="col-xl col-md-6 col-sm-6">
         <div class="stat-card bg-gradient-green">
             <i class="fas fa-receipt stat-icon"></i>
             <div class="stat-number">@ViewBag.TotalOrders</div>
-            <div class="stat-label">Tong don hang</div>
-            <div class="stat-trend"><i class="fas fa-arrow-up me-1"></i>Tat ca don hang</div>
+            <div class="stat-label">Tong đơn hàng</div>
+            <div class="stat-trend"><i class="fas fa-arrow-up me-1"></i>Tất cả đơn hàng</div>
         </div>
     </div>
     <div class="col-xl col-md-6 col-sm-6">
         <div class="stat-card bg-gradient-orange">
             <i class="fas fa-coins stat-icon"></i>
-            <div class="stat-number">@(((decimal)ViewBag.TotalRevenue).ToString("N0")) d</div>
+            <div class="stat-number">@(((decimal)ViewBag.TotalRevenue).ToString("N0")) đ</div>
             <div class="stat-label">Doanh thu</div>
-            <div class="stat-trend"><i class="fas fa-arrow-up me-1"></i>Don hoan thanh</div>
+            <div class="stat-trend"><i class="fas fa-arrow-up me-1"></i>Don hoàn thành</div>
         </div>
     </div>
     <div class="col-xl col-md-6 col-sm-6">
         <div class="stat-card bg-gradient-red">
             <i class="fas fa-clock stat-icon"></i>
             <div class="stat-number">@ViewBag.PendingOrders</div>
-            <div class="stat-label">Don cho xac nhan</div>
+            <div class="stat-label">Don chờ xác nhận</div>
             <div class="stat-trend"><i class="fas fa-exclamation-circle me-1"></i>Can xu ly</div>
         </div>
     </div>
@@ -141,7 +141,7 @@
         <div class="stat-card bg-gradient-purple">
             <i class="fas fa-screwdriver-wrench stat-icon"></i>
             <div class="stat-number">@ViewBag.PendingRepairs</div>
-            <div class="stat-label">Lich sua cho duyet</div>
+            <div class="stat-label">Lịch sửa cho duyet</div>
             <div class="stat-trend"><i class="fas fa-exclamation-circle me-1"></i>Can xu ly</div>
         </div>
     </div>
@@ -162,7 +162,7 @@
     <div class="col-lg-5">
         <div class="chart-card">
             <div class="card-header">
-                <i class="fas fa-chart-pie me-2" style="color:#FF6B35;"></i>Don hang theo trang thai
+                <i class="fas fa-chart-pie me-2" style="color:#FF6B35;"></i>Đơn hàng theo trạng thái
             </div>
             <div class="card-body d-flex align-items-center justify-content-center" style="padding:20px;min-height:320px;">
                 <canvas id="orderStatusChart" height="260"></canvas>
@@ -176,16 +176,16 @@
     <h6 class="fw-bold text-muted text-uppercase mb-3" style="font-size:0.8rem;letter-spacing:1px;">Thao tac nhanh</h6>
     <div class="d-flex flex-wrap gap-2">
         <a asp-area="Admin" asp-controller="Product" asp-action="Create" class="quick-action-btn btn btn-primary">
-            <i class="fas fa-plus"></i> Them san pham
+            <i class="fas fa-plus"></i> Them sản phẩm
         </a>
         <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="quick-action-btn btn btn-success">
-            <i class="fas fa-receipt"></i> Xem don hang
+            <i class="fas fa-receipt"></i> Xem đơn hàng
         </a>
         <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="quick-action-btn btn btn-info text-white">
-            <i class="fas fa-layer-group"></i> Quan ly danh muc
+            <i class="fas fa-layer-group"></i> Quản lý danh mục
         </a>
         <a asp-area="Admin" asp-controller="RepairBooking" asp-action="Index" class="quick-action-btn btn btn-warning text-white">
-            <i class="fas fa-screwdriver-wrench"></i> Lich sua chua
+            <i class="fas fa-screwdriver-wrench"></i> Lịch sửa chữa
         </a>
     </div>
 </div>
@@ -193,9 +193,9 @@
 <!-- Recent Orders -->
 <div class="card" style="border-radius:14px;">
     <div class="card-header bg-white d-flex justify-content-between align-items-center" style="padding:18px 22px;border-radius:14px 14px 0 0;border-bottom:1px solid #f3f4f6;">
-        <h6 class="mb-0 fw-bold"><i class="fas fa-list me-2" style="color:#FF6B35;"></i>Don hang gan day</h6>
+        <h6 class="mb-0 fw-bold"><i class="fas fa-list me-2" style="color:#FF6B35;"></i>Đơn hàng gan day</h6>
         <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-sm btn-outline-secondary" style="font-size:0.8rem;">
-            Xem tat ca <i class="fas fa-arrow-right ms-1"></i>
+            Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
         </a>
     </div>
     <div class="card-body p-0">
@@ -204,11 +204,11 @@
                 <thead>
                     <tr>
                         <th style="padding:12px 16px;">Ma DH</th>
-                        <th>Khach hang</th>
-                        <th>So dien thoai</th>
-                        <th>Tong tien</th>
-                        <th>Trang thai</th>
-                        <th>Ngay dat</th>
+                        <th>Khách hàng</th>
+                        <th>So điện thoại</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày đặt</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -219,24 +219,24 @@
                             <td style="padding:12px 16px;"><strong>#@order.Id</strong></td>
                             <td>@order.User.FullName</td>
                             <td>@order.PhoneNumber</td>
-                            <td><strong style="color:#FF6B35;">@order.TotalAmount.ToString("N0") d</strong></td>
+                            <td><strong style="color:#FF6B35;">@order.TotalAmount.ToString("N0") đ</strong></td>
                             <td>
                                 @switch (order.Status)
                                 {
                                     case OrderStatus.ChoXacNhan:
-                                        <span class="badge bg-warning text-dark">Cho xac nhan</span>
+                                        <span class="badge bg-warning text-dark">Chờ xác nhận</span>
                                         break;
                                     case OrderStatus.DaXacNhan:
-                                        <span class="badge bg-info">Da xac nhan</span>
+                                        <span class="badge bg-info">Đã xác nhận</span>
                                         break;
                                     case OrderStatus.DangGiao:
-                                        <span class="badge bg-primary">Dang giao</span>
+                                        <span class="badge bg-primary">Đang giao</span>
                                         break;
                                     case OrderStatus.HoanThanh:
-                                        <span class="badge bg-success">Hoan thanh</span>
+                                        <span class="badge bg-success">Hoàn thành</span>
                                         break;
                                     case OrderStatus.DaHuy:
-                                        <span class="badge bg-danger">Da huy</span>
+                                        <span class="badge bg-danger">Đã hủy</span>
                                         break;
                                 }
                             </td>
@@ -254,7 +254,7 @@
                         <tr>
                             <td colspan="7" class="text-center text-muted py-5">
                                 <i class="fas fa-inbox fa-2x mb-2 d-block" style="opacity:0.3;"></i>
-                                Chua co don hang nao
+                                Chưa có đơn hàng nao
                             </td>
                         </tr>
                     }
@@ -292,7 +292,7 @@
                 tooltip: {
                     callbacks: {
                         label: function(ctx) {
-                            return ctx.parsed.y.toLocaleString('vi-VN') + ' d';
+                            return ctx.parsed.y.toLọcaleString('vi-VN') + ' d';
                         }
                     }
                 }
@@ -320,7 +320,7 @@
     new Chart(document.getElementById('orderStatusChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Cho xac nhan', 'Da xac nhan', 'Dang giao', 'Hoan thanh', 'Da huy'],
+            labels: ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Hoàn thành', 'Đã hủy'],
             datasets: [{
                 data: [@ordersByStatus["ChoXacNhan"], @ordersByStatus["DaXacNhan"], @ordersByStatus["DangGiao"], @ordersByStatus["HoanThanh"], @ordersByStatus["DaHuy"]],
                 backgroundColor: ['#f59e0b', '#06b6d4', '#3b82f6', '#10b981', '#ef4444'],

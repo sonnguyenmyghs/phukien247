@@ -1,6 +1,6 @@
 @model Order
 @{
-    ViewData["Title"] = "Chi tiet don hang #" + Model.Id;
+    ViewData["Title"] = "Chi tiet đơn hàng #" + Model.Id;
 }
 
 @section Styles {
@@ -124,11 +124,11 @@
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h5 class="fw-bold mb-1" style="color:#1f2937;">Don hang #@Model.Id</h5>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Đơn hàng #@Model.Id</h5>
         <p class="text-muted mb-0" style="font-size:0.85rem;">Dat ngay @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
     </div>
     <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-back">
-        <i class="fas fa-arrow-left me-1"></i> Quay lai
+        <i class="fas fa-arrow-left me-1"></i> Quay lại
     </a>
 </div>
 
@@ -138,13 +138,13 @@
         <!-- Customer Info -->
         <div class="card detail-card mb-4">
             <div class="card-header">
-                <h6 class="mb-0 fw-bold"><i class="fas fa-user me-2" style="color:#FF6B35;"></i>Thong tin khach hang</h6>
+                <h6 class="mb-0 fw-bold"><i class="fas fa-user me-2" style="color:#FF6B35;"></i>Thong tin khách hàng</h6>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="info-row">
-                            <span class="info-label">Khach hang</span>
+                            <span class="info-label">Khách hàng</span>
                             <span class="info-value">@Model.User.FullName</span>
                         </div>
                         <div class="info-row">
@@ -152,17 +152,17 @@
                             <span class="info-value">@Model.User.Email</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">So dien thoai</span>
+                            <span class="info-label">So điện thoại</span>
                             <span class="info-value">@Model.PhoneNumber</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-row">
-                            <span class="info-label">Dia chi giao</span>
+                            <span class="info-label">Địa chỉ giao</span>
                             <span class="info-value">@Model.ShippingAddress</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Thanh toan</span>
+                            <span class="info-label">Thanh toán</span>
                             <span class="info-value">
                                 @if (Model.PaymentMethod == PaymentMethod.COD)
                                 {
@@ -170,14 +170,14 @@
                                 }
                                 else
                                 {
-                                    <span class="badge" style="background:#e0f2fe;color:#0284c7;border-radius:20px;padding:5px 12px;">Chuyen khoan</span>
+                                    <span class="badge" style="background:#e0f2fe;color:#0284c7;border-radius:20px;padding:5px 12px;">Chuyển khoản</span>
                                 }
                             </span>
                         </div>
                         @if (!string.IsNullOrEmpty(Model.Note))
                         {
                             <div class="info-row">
-                                <span class="info-label">Ghi chu</span>
+                                <span class="info-label">Ghi chú</span>
                                 <span class="info-value fst-italic">@Model.Note</span>
                             </div>
                         }
@@ -189,17 +189,17 @@
         <!-- Order Items -->
         <div class="card detail-card">
             <div class="card-header">
-                <h6 class="mb-0 fw-bold"><i class="fas fa-list me-2" style="color:#FF6B35;"></i>Chi tiet san pham</h6>
+                <h6 class="mb-0 fw-bold"><i class="fas fa-list me-2" style="color:#FF6B35;"></i>Chi tiet sản phẩm</h6>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table item-table mb-0">
                         <thead>
                             <tr>
-                                <th>San pham</th>
-                                <th>Don gia</th>
-                                <th>So luong</th>
-                                <th>Thanh tien</th>
+                                <th>Sản phẩm</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -225,19 +225,19 @@
                                             <strong>@item.Product.Name</strong>
                                         </div>
                                     </td>
-                                    <td>@item.UnitPrice.ToString("N0") d</td>
+                                    <td>@item.UnitPrice.ToString("N0") đ</td>
                                     <td><span class="badge" style="background:#f3f4f6;color:#374151;border-radius:8px;padding:4px 12px;font-size:0.85rem;">x@item.Quantity</span></td>
-                                    <td><strong>@((item.UnitPrice * item.Quantity).ToString("N0")) d</strong></td>
+                                    <td><strong>@((item.UnitPrice * item.Quantity).ToString("N0")) đ</strong></td>
                                 </tr>
                             }
                         </tbody>
                         <tfoot>
                             <tr class="total-row">
                                 <td colspan="3" class="text-end pe-3">
-                                    <strong style="font-size:0.95rem;">Tong cong:</strong>
+                                    <strong style="font-size:0.95rem;">Tổng cộng:</strong>
                                 </td>
                                 <td>
-                                    <span class="total-amount">@Model.TotalAmount.ToString("N0") d</span>
+                                    <span class="total-amount">@Model.TotalAmount.ToString("N0") đ</span>
                                 </td>
                             </tr>
                         </tfoot>
@@ -251,71 +251,71 @@
     <div class="col-lg-4">
         <div class="card status-update-card">
             <div class="card-header" style="background:none;border-bottom:1px solid #f3f4f6;padding:18px 22px;">
-                <h6 class="mb-0 fw-bold"><i class="fas fa-sync-alt me-2" style="color:#FF6B35;"></i>Trang thai don hang</h6>
+                <h6 class="mb-0 fw-bold"><i class="fas fa-sync-alt me-2" style="color:#FF6B35;"></i>Trạng thái đơn hàng</h6>
             </div>
             <div class="card-body" style="padding:22px;">
                 <div class="text-center mb-4 p-3" style="background:#f9fafb;border-radius:12px;">
-                    <small class="text-muted d-block mb-2">Trang thai hien tai</small>
+                    <small class="text-muted d-block mb-2">Trạng thái hien tai</small>
                     @switch (Model.Status)
                     {
                         case OrderStatus.ChoXacNhan:
-                            <span class="status-badge-lg badge bg-warning text-dark">Cho xac nhan</span>
+                            <span class="status-badge-lg badge bg-warning text-dark">Chờ xác nhận</span>
                             break;
                         case OrderStatus.DaXacNhan:
-                            <span class="status-badge-lg badge bg-info">Da xac nhan</span>
+                            <span class="status-badge-lg badge bg-info">Đã xác nhận</span>
                             break;
                         case OrderStatus.DangGiao:
-                            <span class="status-badge-lg badge bg-primary">Dang giao</span>
+                            <span class="status-badge-lg badge bg-primary">Đang giao</span>
                             break;
                         case OrderStatus.HoanThanh:
-                            <span class="status-badge-lg badge bg-success">Hoan thanh</span>
+                            <span class="status-badge-lg badge bg-success">Hoàn thành</span>
                             break;
                         case OrderStatus.DaHuy:
-                            <span class="status-badge-lg badge bg-danger">Da huy</span>
+                            <span class="status-badge-lg badge bg-danger">Đã hủy</span>
                             break;
                     }
                 </div>
 
                 <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size:0.85rem;color:#374151;">Trang thai moi</label>
+                        <label class="form-label fw-semibold" style="font-size:0.85rem;color:#374151;">Trạng thái moi</label>
                         <select name="status" class="form-select" style="border-radius:10px;padding:10px 14px;">
-                            <option value="@OrderStatus.ChoXacNhan" selected="@(Model.Status == OrderStatus.ChoXacNhan)">Cho xac nhan</option>
-                            <option value="@OrderStatus.DaXacNhan" selected="@(Model.Status == OrderStatus.DaXacNhan)">Da xac nhan</option>
-                            <option value="@OrderStatus.DangGiao" selected="@(Model.Status == OrderStatus.DangGiao)">Dang giao</option>
-                            <option value="@OrderStatus.HoanThanh" selected="@(Model.Status == OrderStatus.HoanThanh)">Hoan thanh</option>
-                            <option value="@OrderStatus.DaHuy" selected="@(Model.Status == OrderStatus.DaHuy)">Da huy</option>
+                            <option value="@OrderStatus.ChoXacNhan" selected="@(Model.Status == OrderStatus.ChoXacNhan)">Chờ xác nhận</option>
+                            <option value="@OrderStatus.DaXacNhan" selected="@(Model.Status == OrderStatus.DaXacNhan)">Đã xác nhận</option>
+                            <option value="@OrderStatus.DangGiao" selected="@(Model.Status == OrderStatus.DangGiao)">Đang giao</option>
+                            <option value="@OrderStatus.HoanThanh" selected="@(Model.Status == OrderStatus.HoanThanh)">Hoàn thành</option>
+                            <option value="@OrderStatus.DaHuy" selected="@(Model.Status == OrderStatus.DaHuy)">Đã hủy</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary btn-update w-100">
-                        <i class="fas fa-save me-1"></i> Cap nhat trang thai
+                        <i class="fas fa-save me-1"></i> Cập nhật trạng thái
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Order Timeline -->
+        <!-- Order Tìmeline -->
         <div class="card mt-4" style="border-radius:14px;">
             <div class="card-body" style="padding:22px;">
                 <h6 class="fw-bold mb-3" style="font-size:0.85rem;"><i class="fas fa-info-circle me-2" style="color:#FF6B35;"></i>Thong tin them</h6>
                 <div class="info-row">
-                    <span class="info-label">Ma don</span>
+                    <span class="info-label">Mã đơn</span>
                     <span class="info-value">#@Model.Id</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Ngay dat</span>
+                    <span class="info-label">Ngày đặt</span>
                     <span class="info-value">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">So san pham</span>
-                    <span class="info-value">@Model.OrderDetails.Count san pham</span>
+                    <span class="info-label">So sản phẩm</span>
+                    <span class="info-value">@Model.OrderDetails.Count sản phẩm</span>
                 </div>
             </div>
         </div>
 
         <a asp-area="Admin" asp-controller="Order" asp-action="Index"
            class="btn btn-back w-100 mt-3">
-            <i class="fas fa-arrow-left me-1"></i> Quay lai danh sach
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sach
         </a>
     </div>
 </div>

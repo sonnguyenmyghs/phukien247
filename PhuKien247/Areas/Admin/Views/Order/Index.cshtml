@@ -75,8 +75,8 @@
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h5 class="fw-bold mb-1" style="color:#1f2937;">Quan ly don hang</h5>
-        <p class="text-muted mb-0" style="font-size:0.85rem;">@Model.Count don hang trong he thong</p>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Quản lý đơn hàng</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">@Model.Count đơn hàng trong he thong</p>
     </div>
 </div>
 
@@ -126,12 +126,12 @@
                 <thead>
                     <tr>
                         <th>Ma DH</th>
-                        <th>Khach hang</th>
-                        <th>So dien thoai</th>
-                        <th>Tong tien</th>
-                        <th>Thanh toan</th>
-                        <th>Trang thai</th>
-                        <th>Ngay dat</th>
+                        <th>Khách hàng</th>
+                        <th>So điện thoại</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày đặt</th>
                         <th>Thao tac</th>
                     </tr>
                 </thead>
@@ -142,7 +142,7 @@
                             <td><strong>#@order.Id</strong></td>
                             <td>@order.User.FullName</td>
                             <td class="text-muted">@order.PhoneNumber</td>
-                            <td><strong style="color:#FF6B35;">@order.TotalAmount.ToString("N0") d</strong></td>
+                            <td><strong style="color:#FF6B35;">@order.TotalAmount.ToString("N0") đ</strong></td>
                             <td>
                                 @if (order.PaymentMethod == PaymentMethod.COD)
                                 {
@@ -150,26 +150,26 @@
                                 }
                                 else
                                 {
-                                    <span class="badge" style="background:#e0f2fe;color:#0284c7;border-radius:20px;padding:5px 10px;">Chuyen khoan</span>
+                                    <span class="badge" style="background:#e0f2fe;color:#0284c7;border-radius:20px;padding:5px 10px;">Chuyển khoản</span>
                                 }
                             </td>
                             <td>
                                 @switch (order.Status)
                                 {
                                     case OrderStatus.ChoXacNhan:
-                                        <span class="status-badge badge bg-warning text-dark">Cho xac nhan</span>
+                                        <span class="status-badge badge bg-warning text-dark">Chờ xác nhận</span>
                                         break;
                                     case OrderStatus.DaXacNhan:
-                                        <span class="status-badge badge bg-info">Da xac nhan</span>
+                                        <span class="status-badge badge bg-info">Đã xác nhận</span>
                                         break;
                                     case OrderStatus.DangGiao:
-                                        <span class="status-badge badge bg-primary">Dang giao</span>
+                                        <span class="status-badge badge bg-primary">Đang giao</span>
                                         break;
                                     case OrderStatus.HoanThanh:
-                                        <span class="status-badge badge bg-success">Hoan thanh</span>
+                                        <span class="status-badge badge bg-success">Hoàn thành</span>
                                         break;
                                     case OrderStatus.DaHuy:
-                                        <span class="status-badge badge bg-danger">Da huy</span>
+                                        <span class="status-badge badge bg-danger">Đã hủy</span>
                                         break;
                                 }
                             </td>
@@ -187,7 +187,7 @@
                         <tr>
                             <td colspan="8" class="text-center text-muted py-5">
                                 <i class="fas fa-receipt fa-2x mb-2 d-block" style="opacity:0.3;"></i>
-                                Chua co don hang nao
+                                Chưa có đơn hàng nao
                             </td>
                         </tr>
                     }
