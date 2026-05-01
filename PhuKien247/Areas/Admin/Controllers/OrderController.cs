@@ -85,4 +85,18 @@ public class OrderController : Controller
         TempData["Success"] = "Cập nhật trạng thái đơn hàng thành công!";
         return RedirectToAction(nameof(Details), new { id });
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkPaid(int id)
+    {
+        var order = await _context.Orders.FindAsync(id);
+        if (order == null) return NotFound();
+
+        order.IsPaid = true;
+        order.PaidAt = DateTime.Now;
+        await _context.SaveChangesAsync();
+        TempData["Success"] = "Đã xác nhận đơn hàng được thanh toán!";
+        return RedirectToAction(nameof(Details), new { id });
+    }
 }

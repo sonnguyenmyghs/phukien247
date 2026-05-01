@@ -1,0 +1,223 @@
+@model Order
+@{
+    ViewData["Title"] = "Thanh toán đơn hàng";
+    // Tạo QR VietQR mock - dùng API miễn phí của VietQR
+    var bankBin = "970422"; // MB Bank
+    var accountNo = "0123456789";
+    var accountName = "PHUKIEN247";
+    var amount = (long)Model.TotalAmount;
+    var addInfo = $"PK247 DH{Model.Id:D6}";
+    var qrUrl = $"https://img.vietqr.io/image/{bankBin}-{accountNo}-compact2.png?amount={amount}&addInfo={Uri.EscapeDataString(addInfo)}&accountName={Uri.EscapeDataString(accountName)}";
+}
+
+<div class="container py-5" style="max-width: 900px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb" style="background:transparent;">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" style="color:#6c757d;">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Cart" asp-action="Index" style="color:#6c757d;">Giỏ hàng</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Order" asp-action="Checkout" style="color:#6c757d;">Thanh toán</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chuyển khoản</li>
+        </ol>
+    </nav>
+
+    @if (Model.IsPaid)
+    {
+        <div class="alert alert-success border-0 shadow-sm" style="border-radius:14px;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle fa-2x me-3"></i>
+                <div>
+                    <h5 class="mb-1 fw-bold">Đã ghi nhận thanh toán</h5>
+                    <p class="mb-0">Đơn hàng đang chờ shop xác nhận. Bạn có thể theo dõi tại <a asp-action="History">Lịch sử đơn hàng</a>.</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm" style="border-radius:18px; overflow:hidden;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #FF6B35, #e55a26); color:#fff; padding: 28px 32px;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <p class="mb-1 opacity-75" style="font-size:0.9rem;">Đơn hàng</p>
+                    <h3 class="fw-bold mb-0">#@Model.Id.ToString("D6")</h3>
+                </div>
+                <div class="text-end">
+                    <p class="mb-1 opacity-75" style="font-size:0.9rem;">Số tiền cần chuyển</p>
+                    <h2 class="fw-bold mb-0">@Model.TotalAmount.ToString("N0") đ</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <div class="row g-4">
+                <!-- QR Code -->
+                <div class="col-md-5 text-center">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-qrcode me-2" style="color:#FF6B35;"></i>Quét QR để chuyển khoản</h5>
+                    <div style="background:#fff; border:3px solid #FF6B35; border-radius:18px; padding:12px; display:inline-block;">
+                        <img src="@qrUrl" alt="QR Code" style="width: 100%; max-width: 280px; display:block;" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22280%22 height=%22280%22%3E%3Crect width=%22280%22 height=%22280%22 fill=%22%23f8f9fa%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23adb5bd%22%3EQR Code%3C/text%3E%3C/svg%3E';" />
+                    </div>
+                    <p class="text-muted mt-2 small">Mở app ngân hàng và quét mã QR</p>
+                </div>
+
+                <!-- Bank Info -->
+                <div class="col-md-7">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-university me-2" style="color:#FF6B35;"></i>Hoặc chuyển khoản thủ công</h5>
+                    <div class="bank-info">
+                        <div class="info-row">
+                            <span class="label">Ngân hàng</span>
+                            <span class="value">MB Bank (Quân Đội)</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Số tài khoản</span>
+                            <span class="value">
+                                <strong>@accountNo</strong>
+                                <button class="btn-copy" onclick="copyText('@accountNo', this)" title="Sao chép">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Chủ tài khoản</span>
+                            <span class="value">@accountName</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Số tiền</span>
+                            <span class="value">
+                                <strong style="color:#FF6B35;">@Model.TotalAmount.ToString("N0") đ</strong>
+                                <button class="btn-copy" onclick="copyText('@amount', this)" title="Sao chép">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Nội dung CK</span>
+                            <span class="value">
+                                <strong style="color:#FF6B35;">@addInfo</strong>
+                                <button class="btn-copy" onclick="copyText('@addInfo', this)" title="Sao chép">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning mt-3 mb-0 border-0" style="border-radius:12px; background:#fff7ed;">
+                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                        <strong>Lưu ý:</strong> Vui lòng chuyển khoản đúng nội dung <strong>@addInfo</strong> để shop tự động đối soát.
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Action -->
+            @if (!Model.IsPaid)
+            {
+                <div class="text-center">
+                    <p class="text-muted mb-3">Sau khi chuyển khoản xong, vui lòng nhấn nút bên dưới để xác nhận.</p>
+                    <form asp-action="ConfirmPayment" asp-route-id="@Model.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-lg text-white fw-bold px-5"
+                                style="background: linear-gradient(135deg, #10b981, #059669); border-radius:12px;">
+                            <i class="fas fa-check-circle me-2"></i>Tôi đã chuyển khoản
+                        </button>
+                    </form>
+                    <a asp-action="History" class="btn btn-outline-secondary btn-lg ms-2" style="border-radius:12px;">
+                        <i class="fas fa-clock me-1"></i>Thanh toán sau
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="text-center">
+                    <a asp-action="Confirmation" asp-route-id="@Model.Id" class="btn btn-lg text-white fw-bold px-5"
+                       style="background: linear-gradient(135deg, #FF6B35, #e55a26); border-radius:12px;">
+                        <i class="fas fa-receipt me-2"></i>Xem chi tiết đơn hàng
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="card border-0 shadow-sm mt-4" style="border-radius:18px;">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3"><i class="fas fa-shopping-bag me-2" style="color:#FF6B35;"></i>Đơn hàng của bạn</h6>
+            <div class="table-responsive">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        @foreach (var item in Model.OrderDetails)
+                        {
+                            <tr>
+                                <td>@item.Product.Name</td>
+                                <td class="text-center" style="width:80px;">x@(item.Quantity)</td>
+                                <td class="text-end" style="width:140px;">@((item.UnitPrice * item.Quantity).ToString("N0")) đ</td>
+                            </tr>
+                        }
+                        <tr style="border-top:2px solid #e5e7eb;">
+                            <td colspan="2" class="fw-bold pt-3">Tổng cộng</td>
+                            <td class="text-end fw-bold pt-3" style="font-size:1.2rem; color:#FF6B35;">@Model.TotalAmount.ToString("N0") đ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bank-info {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 16px;
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-row .label {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    .info-row .value {
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-copy {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 4px 8px;
+        cursor: pointer;
+        color: #FF6B35;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .btn-copy:hover {
+        background: #FF6B35;
+        color: #fff;
+        border-color: #FF6B35;
+    }
+</style>
+
+<script>
+    function copyText(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.style.color = '#10b981';
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.style.color = '';
+            }, 1500);
+        });
+    }
+</script>

@@ -34,6 +34,10 @@ public class Order
 
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.COD;
 
+    public bool IsPaid { get; set; } = false;
+
+    public DateTime? PaidAt { get; set; }
+
     [Required, MaxLength(500)]
     public string ShippingAddress { get; set; } = string.Empty;
 

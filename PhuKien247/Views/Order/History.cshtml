@@ -260,6 +260,21 @@
                                     </span>
                                     break;
                             }
+                            @if (order.PaymentMethod == PhuKien247.Models.PaymentMethod.BankTransfer)
+                            {
+                                if (order.IsPaid)
+                                {
+                                    <span class="status-badge status-hoan-thanh ms-1" title="@(order.PaidAt?.ToString("dd/MM/yyyy HH:mm") ?? "")">
+                                        <i class="fas fa-check-double"></i> Đã thanh toán
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-da-huy ms-1">
+                                        <i class="fas fa-exclamation-circle"></i> Chưa TT
+                                    </span>
+                                }
+                            }
                         </div>
                     </div>
                     <div class="order-card-body">
@@ -267,9 +282,17 @@
                             <span class="order-total-label">Tổng tiền</span>
                             <div class="order-total-value">@order.TotalAmount.ToString("N0") đ</div>
                         </div>
-                        <a asp-action="Confirmation" asp-route-id="@order.Id" class="btn-view-detail">
-                            <i class="fas fa-eye me-1"></i>Xem chi tiết
-                        </a>
+                        <div class="d-flex gap-2">
+                            @if (order.PaymentMethod == PhuKien247.Models.PaymentMethod.BankTransfer && !order.IsPaid && order.Status != PhuKien247.Models.OrderStatus.DaHuy)
+                            {
+                                <a asp-action="Payment" asp-route-id="@order.Id" class="btn-view-detail" style="background:linear-gradient(135deg,#10b981,#059669);">
+                                    <i class="fas fa-credit-card me-1"></i>Thanh toán
+                                </a>
+                            }
+                            <a asp-action="Confirmation" asp-route-id="@order.Id" class="btn-view-detail">
+                                <i class="fas fa-eye me-1"></i>Xem chi tiết
+                            </a>
+                        </div>
                     </div>
                 </div>
             }

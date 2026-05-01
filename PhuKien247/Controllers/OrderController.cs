@@ -95,7 +95,52 @@ public class OrderController : Controller
 
         HttpContext.Session.Remove(CartSessionKey);
 
+        // Nếu chuyển khoản, đưa user tới trang thanh toán mock
+        if (order.PaymentMethod == Models.PaymentMethod.BankTransfer)
+        {
+            return RedirectToAction(nameof(Payment), new { id = order.Id });
+        }
+
         return RedirectToAction(nameof(Confirmation), new { id = order.Id });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Payment(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return RedirectToAction("Login", "Account");
+
+        var order = await _context.Orders
+            .Include(o => o.OrderDetails).ThenInclude(od => od.Product)
+            .FirstOrDefaultAsync(o => o.Id == id && o.UserId == user.Id);
+
+        if (order == null)
+            return NotFound();
+
+        return View(order);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmPayment(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return RedirectToAction("Login", "Account");
+
+        var order = await _context.Orders
+            .FirstOrDefaultAsync(o => o.Id == id && o.UserId == user.Id);
+
+        if (order == null)
+            return NotFound();
+
+        order.IsPaid = true;
+        order.PaidAt = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Đã ghi nhận thanh toán. Đơn hàng sẽ được xử lý sau khi shop xác nhận chuyển khoản.";
+        return RedirectToAction(nameof(Confirmation), new { id });
     }
 
     public async Task<IActionResult> Confirmation(int id)

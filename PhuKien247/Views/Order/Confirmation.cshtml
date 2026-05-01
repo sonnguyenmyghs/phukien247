@@ -344,6 +344,34 @@
                                 </span>
                             </span>
                         </div>
+                        @if (Model.PaymentMethod == PhuKien247.Models.PaymentMethod.BankTransfer)
+                        {
+                            <div class="info-row">
+                                <span class="info-label"><i class="fas fa-credit-card me-2" style="color:#FF6B35;"></i>Thanh toán</span>
+                                <span class="info-value">
+                                    @if (Model.IsPaid)
+                                    {
+                                        <span class="badge" style="background:#ecfdf5; color:#16a34a; font-weight:600; padding:0.35rem 0.75rem; border-radius:8px;">
+                                            <i class="fas fa-check-circle me-1"></i>Đã thanh toán
+                                            @if (Model.PaidAt.HasValue)
+                                            {
+                                                <span class="ms-1 small" style="opacity:0.8;">(@Model.PaidAt.Value.ToString("dd/MM/yyyy HH:mm"))</span>
+                                            }
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge" style="background:#fee2e2; color:#dc2626; font-weight:600; padding:0.35rem 0.75rem; border-radius:8px;">
+                                            <i class="fas fa-exclamation-circle me-1"></i>Chưa thanh toán
+                                        </span>
+                                        <a asp-action="Payment" asp-route-id="@Model.Id" class="btn btn-sm ms-2 text-white"
+                                           style="background:linear-gradient(135deg,#FF6B35,#e55a26); border-radius:8px;">
+                                            <i class="fas fa-arrow-right me-1"></i>Tiếp tục thanh toán
+                                        </a>
+                                    }
+                                </span>
+                            </div>
+                        }
                     </div>
                 </div>
 

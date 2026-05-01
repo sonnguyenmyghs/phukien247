@@ -151,6 +151,14 @@
                                 else
                                 {
                                     <span class="badge" style="background:#e0f2fe;color:#0284c7;border-radius:20px;padding:5px 10px;">Chuyển khoản</span>
+                                    if (order.IsPaid)
+                                    {
+                                        <span class="badge ms-1" style="background:#dcfce7;color:#16a34a;border-radius:20px;padding:5px 10px;" title="@(order.PaidAt?.ToString("dd/MM/yyyy HH:mm") ?? "")"><i class="fas fa-check me-1"></i>Đã TT</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge ms-1" style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:5px 10px;"><i class="fas fa-clock me-1"></i>Chưa TT</span>
+                                    }
                                 }
                             </td>
                             <td>
