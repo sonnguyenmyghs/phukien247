@@ -65,11 +65,14 @@ public class ReportController : Controller
     {
         var (from, to) = NormalizeDates(fromDate, toDate);
 
-        var data = await _context.OrderDetails
+        var rawData = await _context.OrderDetails
             .Include(od => od.Order)
             .Include(od => od.Product)
             .Where(od => od.Order.Status == OrderStatus.HoanThanh
                       && od.Order.CreatedAt >= from && od.Order.CreatedAt <= to)
+            .ToListAsync();
+
+        var data = rawData
             .GroupBy(od => new { od.ProductId, od.Product.Name, od.Product.ImageUrl, od.Product.Price })
             .Select(g => new TopProductItem
             {
@@ -82,7 +85,7 @@ public class ReportController : Controller
             })
             .OrderByDescending(x => x.TotalQuantity)
             .Take(10)
-            .ToListAsync();
+            .ToList();
 
         ViewBag.FromDate = from;
         ViewBag.ToDate = to;
@@ -99,9 +102,12 @@ public class ReportController : Controller
     {
         var (from, to) = NormalizeDates(fromDate, toDate);
 
-        var data = await _context.Orders
+        var rawData = await _context.Orders
             .Include(o => o.User)
             .Where(o => o.Status == OrderStatus.HoanThanh && o.CreatedAt >= from && o.CreatedAt <= to)
+            .ToListAsync();
+
+        var data = rawData
             .GroupBy(o => new { o.UserId, o.User.FullName, o.User.Email, o.User.PhoneNumber })
             .Select(g => new TopCustomerItem
             {
@@ -114,7 +120,7 @@ public class ReportController : Controller
             })
             .OrderByDescending(x => x.TotalSpent)
             .Take(10)
-            .ToListAsync();
+            .ToList();
 
         ViewBag.FromDate = from;
         ViewBag.ToDate = to;
@@ -131,11 +137,14 @@ public class ReportController : Controller
     {
         var (from, to) = NormalizeDates(fromDate, toDate);
 
-        var data = await _context.OrderDetails
+        var rawData = await _context.OrderDetails
             .Include(od => od.Order)
             .Include(od => od.Product).ThenInclude(p => p.Category)
             .Where(od => od.Order.Status == OrderStatus.HoanThanh
                       && od.Order.CreatedAt >= from && od.Order.CreatedAt <= to)
+            .ToListAsync();
+
+        var data = rawData
             .GroupBy(od => new { od.Product.CategoryId, od.Product.Category.Name })
             .Select(g => new RevenueByCategoryItem
             {
@@ -145,7 +154,7 @@ public class ReportController : Controller
                 TotalRevenue = g.Sum(x => x.UnitPrice * x.Quantity)
             })
             .OrderByDescending(x => x.TotalRevenue)
-            .ToListAsync();
+            .ToList();
 
         ViewBag.FromDate = from;
         ViewBag.ToDate = to;
@@ -184,9 +193,12 @@ public class ReportController : Controller
     {
         var (from, to) = NormalizeDates(fromDate, toDate);
 
-        var data = await _context.RepairBookings
+        var rawData = await _context.RepairBookings
             .Include(r => r.Service)
             .Where(r => r.CreatedAt >= from && r.CreatedAt <= to)
+            .ToListAsync();
+
+        var data = rawData
             .GroupBy(r => new { r.ServiceId, r.Service.Name, r.Service.Price })
             .Select(g => new TopServiceItem
             {
@@ -198,7 +210,7 @@ public class ReportController : Controller
             })
             .OrderByDescending(x => x.BookingCount)
             .Take(10)
-            .ToListAsync();
+            .ToList();
 
         ViewBag.FromDate = from;
         ViewBag.ToDate = to;

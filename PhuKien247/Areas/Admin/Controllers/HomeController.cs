@@ -21,9 +21,11 @@ public class HomeController : Controller
     {
         ViewBag.TotalProducts = await _context.Products.CountAsync();
         ViewBag.TotalOrders = await _context.Orders.CountAsync();
-        ViewBag.TotalRevenue = await _context.Orders
+        var completedTotals = await _context.Orders
             .Where(o => o.Status == OrderStatus.HoanThanh)
-            .SumAsync(o => o.TotalAmount);
+            .Select(o => o.TotalAmount)
+            .ToListAsync();
+        ViewBag.TotalRevenue = completedTotals.Sum();
         ViewBag.PendingOrders = await _context.Orders
             .Where(o => o.Status == OrderStatus.ChoXacNhan)
             .CountAsync();
