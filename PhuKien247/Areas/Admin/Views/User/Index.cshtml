@@ -1,0 +1,169 @@
+@using PhuKien247.Areas.Admin.Controllers
+@model List<UserListItem>
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+}
+
+@section Styles {
+<style>
+    .user-table th {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b7280;
+        font-weight: 600;
+        border-bottom: 2px solid #f3f4f6;
+        padding: 14px 16px;
+        white-space: nowrap;
+    }
+    .user-table td {
+        vertical-align: middle;
+        padding: 12px 16px;
+        font-size: 0.88rem;
+    }
+    .user-table tbody tr { transition: background 0.15s; }
+    .user-table tbody tr:nth-child(even) { background: #fafbfc; }
+    .user-table tbody tr:hover { background: #fff7ed; }
+    .user-avatar {
+        width: 38px; height: 38px; border-radius: 50%;
+        background: linear-gradient(135deg, #FF6B35, #ff8f5e);
+        color: #fff; font-weight: 700; font-size: 0.9rem;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .badge-role {
+        border-radius: 20px; padding: 4px 12px;
+        font-weight: 600; font-size: 0.75rem;
+    }
+    .badge-admin { background: #fee2e2; color: #991b1b; }
+    .badge-customer { background: #dbeafe; color: #1e40af; }
+    .badge-none { background: #f3f4f6; color: #6b7280; }
+    .badge-status {
+        border-radius: 20px; padding: 4px 12px;
+        font-weight: 600; font-size: 0.75rem;
+    }
+    .badge-active { background: #d1fae5; color: #065f46; }
+    .badge-locked { background: #fee2e2; color: #991b1b; }
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 8px; font-size: 0.78rem;
+        transition: all 0.2s; border: 1px solid;
+        background: transparent; cursor: pointer;
+        text-decoration: none; display: inline-flex;
+        align-items: center; gap: 4px;
+    }
+    .btn-action-view { color: #0284c7; border-color: #bae6fd; }
+    .btn-action-view:hover { background: #0284c7; color: #fff; border-color: #0284c7; }
+    .btn-action-lock { color: #ef4444; border-color: #fecaca; }
+    .btn-action-lock:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+    .btn-action-unlock { color: #10b981; border-color: #a7f3d0; }
+    .btn-action-unlock:hover { background: #10b981; color: #fff; border-color: #10b981; }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Quản lý khách hàng</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">@Model.Count tài khoản trong hệ thống</p>
+    </div>
+</div>
+
+<div class="card" style="border-radius:14px;">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table user-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Khách hàng</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var initial = !string.IsNullOrEmpty(item.User.FullName)
+                            ? item.User.FullName.Substring(0, 1).ToUpper()
+                            : (item.User.Email?.Substring(0, 1).ToUpper() ?? "?");
+
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="user-avatar">@initial</div>
+                                    <div>
+                                        <div class="fw-semibold">@item.User.FullName</div>
+                                        <div class="text-muted" style="font-size:0.75rem;">ID: @item.User.Id.Substring(0, Math.Min(8, item.User.Id.Length))...</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@item.User.Email</td>
+                            <td class="text-muted">@(item.User.PhoneNumber ?? "-")</td>
+                            <td>
+                                @if (!item.Roles.Any())
+                                {
+                                    <span class="badge-role badge-none">Chưa gán</span>
+                                }
+                                else
+                                {
+                                    foreach (var role in item.Roles)
+                                    {
+                                        var cls = role == "Admin" ? "badge-admin" : "badge-customer";
+                                        <span class="badge-role @cls me-1">@role</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsLocked)
+                                {
+                                    <span class="badge-status badge-locked"><i class="fas fa-lock me-1"></i>Đã khóa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status badge-active"><i class="fas fa-check-circle me-1"></i>Hoạt động</span>
+                                }
+                            </td>
+                            <td class="text-muted" style="white-space:nowrap;">@item.User.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a asp-area="Admin" asp-controller="User" asp-action="Details" asp-route-id="@item.User.Id"
+                                       class="btn-action btn-action-view" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </a>
+                                    <form asp-area="Admin" asp-controller="User" asp-action="ToggleLock" asp-route-id="@item.User.Id"
+                                          method="post" class="d-inline"
+                                          onsubmit="return confirm('Bạn có chắc muốn @(item.IsLocked ? "mở khóa" : "khóa") tài khoản này?');">
+                                        @Html.AntiForgeryToken()
+                                        @if (item.IsLocked)
+                                        {
+                                            <button type="submit" class="btn-action btn-action-unlock" title="Mở khóa">
+                                                <i class="fas fa-unlock"></i> Mở khóa
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn-action btn-action-lock" title="Khóa">
+                                                <i class="fas fa-lock"></i> Khóa
+                                            </button>
+                                        }
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">
+                                <i class="fas fa-users fa-2x mb-2 d-block" style="opacity:0.3;"></i>
+                                Chưa có khách hàng nào
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

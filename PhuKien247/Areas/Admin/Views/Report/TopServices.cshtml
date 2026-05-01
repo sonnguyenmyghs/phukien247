@@ -1,0 +1,161 @@
+@using PhuKien247.Areas.Admin.Controllers
+@model List<TopServiceItem>
+@{
+    ViewData["Title"] = "Top dịch vụ sửa chữa";
+    var labels = (List<string>)ViewBag.Labels;
+    var counts = (List<int>)ViewBag.Counts;
+    var from = (DateTime)ViewBag.FromDate;
+    var to = (DateTime)ViewBag.ToDate;
+    var totalBookings = (int)ViewBag.TotalBookings;
+    var totalServices = (int)ViewBag.TotalServices;
+}
+
+@section Styles {
+<style>
+    .report-stat { border-radius: 14px; padding: 20px; color: #fff; position: relative; overflow: hidden; min-height: 110px; }
+    .report-stat .icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 2.6rem; opacity: 0.18; }
+    .report-stat .num { font-size: 1.6rem; font-weight: 800; }
+    .report-stat .lbl { font-size: 0.82rem; opacity: 0.9; }
+    .bg-gr-orange { background: linear-gradient(135deg,#FF6B35 0%,#f7971e 100%); }
+    .bg-gr-green { background: linear-gradient(135deg,#11998e 0%,#38ef7d 100%); }
+    .bg-gr-purple { background: linear-gradient(135deg,#a855f7 0%,#6366f1 100%); }
+    .filter-card { background: #fff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .chart-box { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 22px; }
+    .chart-box h6 { font-weight: 700; color: #1f2937; margin-bottom: 16px; }
+    .rank-badge { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .rank-1 { background: linear-gradient(135deg,#fbbf24,#f59e0b); }
+    .rank-2 { background: linear-gradient(135deg,#9ca3af,#6b7280); }
+    .rank-3 { background: linear-gradient(135deg,#cd7f32,#a16207); }
+    .rank-other { background: #e5e7eb; color: #6b7280; }
+    .btn-print { background: linear-gradient(135deg,#FF6B35,#f7971e); color:#fff; border:none; padding:8px 18px; border-radius:8px; font-weight:600; }
+    .btn-print:hover { color:#fff; opacity: 0.92; }
+    @@media print {
+        .admin-sidebar, .admin-topbar, .filter-card, .btn-print, .no-print { display: none !important; }
+        .admin-main { margin-left: 0 !important; }
+    }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h4 class="fw-bold mb-0" style="color:#1f2937;"><i class="fas fa-tools me-2" style="color:#FF6B35;"></i>Top dịch vụ sửa chữa</h4>
+    <button type="button" class="btn-print" onclick="window.print()"><i class="fas fa-print me-1"></i>In báo cáo</button>
+</div>
+
+<form method="get" class="filter-card mb-4 no-print">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Từ ngày</label>
+            <input type="date" name="fromDate" value="@from.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Đến ngày</label>
+            <input type="date" name="toDate" value="@to.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn w-100" style="background:linear-gradient(135deg,#FF6B35,#f7971e);color:#fff;border:none;border-radius:8px;padding:8px;font-weight:600;">
+                <i class="fas fa-filter me-1"></i>Lọc dữ liệu
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="mb-3 text-muted">
+    <i class="fas fa-calendar me-1"></i> Khoảng thời gian: <strong>@from.ToString("dd/MM/yyyy")</strong> - <strong>@to.ToString("dd/MM/yyyy")</strong>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-orange">
+            <i class="fas fa-clipboard-list icon"></i>
+            <div class="num">@totalBookings</div>
+            <div class="lbl">Tổng lượt đặt</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-green">
+            <i class="fas fa-tools icon"></i>
+            <div class="num">@totalServices</div>
+            <div class="lbl">Dịch vụ trong top</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-purple">
+            <i class="fas fa-check-double icon"></i>
+            <div class="num">@Model.Sum(m => m.CompletedCount)</div>
+            <div class="lbl">Đã hoàn thành</div>
+        </div>
+    </div>
+</div>
+
+<div class="chart-box mb-4">
+    <h6><i class="fas fa-chart-bar me-2" style="color:#FF6B35;"></i>Biểu đồ top dịch vụ</h6>
+    <canvas id="topServicesChart" height="100"></canvas>
+</div>
+
+<div class="chart-box">
+    <h6><i class="fas fa-table me-2" style="color:#FF6B35;"></i>Danh sách chi tiết</h6>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background:#f9fafb;">
+                <tr>
+                    <th style="width:60px;">#</th>
+                    <th>Tên dịch vụ</th>
+                    <th class="text-end">Giá</th>
+                    <th class="text-center">Lượt đặt</th>
+                    <th class="text-center">Hoàn thành</th>
+                    <th class="text-center">Tỷ lệ HT</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    int rank = 1;
+                    foreach (var s in Model)
+                    {
+                        var rate = s.BookingCount > 0 ? (double)s.CompletedCount / s.BookingCount * 100 : 0;
+                        <tr>
+                            <td>
+                                <span class="rank-badge @(rank == 1 ? "rank-1" : rank == 2 ? "rank-2" : rank == 3 ? "rank-3" : "rank-other")">@rank</span>
+                            </td>
+                            <td class="fw-semibold">@s.ServiceName</td>
+                            <td class="text-end">@s.Price.ToString("N0") đ</td>
+                            <td class="text-center"><span class="badge bg-warning text-dark">@s.BookingCount</span></td>
+                            <td class="text-center"><span class="badge bg-success">@s.CompletedCount</span></td>
+                            <td class="text-center fw-bold" style="color:#FF6B35;">@rate.ToString("F1")%</td>
+                        </tr>
+                        rank++;
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">Không có dữ liệu trong khoảng thời gian này</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels));
+    const counts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(counts));
+    new Chart(document.getElementById('topServicesChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Số lượt đặt',
+                data: counts,
+                backgroundColor: 'rgba(255,107,53,0.85)',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
+</script>
+}

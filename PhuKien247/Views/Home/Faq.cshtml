@@ -1,0 +1,239 @@
+@{
+    ViewData["Title"] = "Câu hỏi thường gặp";
+}
+
+@section Styles {
+<style>
+    .faq-hero {
+        background: linear-gradient(135deg, #FF6B35 0%, #f7971e 100%);
+        color: #fff; padding: 70px 0 90px; text-align: center; position: relative; overflow: hidden;
+    }
+    .faq-hero::after {
+        content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 60px;
+        background: #fff; clip-path: polygon(0 100%, 100% 100%, 100% 0);
+    }
+    .faq-hero h1 { font-size: 2.6rem; font-weight: 800; margin-bottom: 8px; }
+    .faq-hero p { opacity: 0.92; font-size: 1.05rem; }
+    .faq-section { padding: 70px 0; }
+    .accordion-item {
+        border: none !important; margin-bottom: 14px;
+        border-radius: 14px !important; overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .accordion-button {
+        font-weight: 600; color: #1f2937; padding: 18px 22px;
+        background: #fff !important; border: none; box-shadow: none !important;
+    }
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(135deg,#FF6B35,#f7971e) !important;
+        color: #fff !important;
+    }
+    .accordion-button:not(.collapsed)::after {
+        filter: brightness(0) invert(1);
+    }
+    .accordion-button:focus { box-shadow: none !important; }
+    .accordion-body {
+        padding: 20px 22px; background: #fafafa;
+        color: #4b5563; line-height: 1.75;
+    }
+    .faq-cta {
+        background: linear-gradient(135deg,#fff7f3 0%, #ffe8db 100%);
+        padding: 50px 30px; border-radius: 18px; text-align: center; margin-top: 60px;
+    }
+</style>
+}
+
+<section class="faq-hero">
+    <div class="container">
+        <h1><i class="fas fa-question-circle me-2"></i>Câu hỏi thường gặp</h1>
+        <p>Mọi thắc mắc của bạn đều có lời giải đáp tại đây</p>
+    </div>
+</section>
+
+<section class="faq-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item" data-aos="fade-up">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                <i class="fas fa-shopping-cart me-2"></i>Làm thế nào để đặt hàng trên PhuKien247?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Đặt hàng tại PhuKien247 rất đơn giản: <br>
+                                <strong>Bước 1:</strong> Tìm và chọn sản phẩm bạn muốn mua. <br>
+                                <strong>Bước 2:</strong> Nhấn nút "Thêm vào giỏ hàng". <br>
+                                <strong>Bước 3:</strong> Vào giỏ hàng và nhấn "Thanh toán". <br>
+                                <strong>Bước 4:</strong> Điền thông tin giao hàng và chọn phương thức thanh toán. <br>
+                                <strong>Bước 5:</strong> Xác nhận đơn hàng và chờ chúng tôi liên hệ giao hàng.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="50">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                <i class="fas fa-shipping-fast me-2"></i>Thời gian giao hàng là bao lâu?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Thời gian giao hàng tùy thuộc vào địa chỉ nhận hàng: <br>
+                                - <strong>Nội thành TP.HCM:</strong> 1-2 giờ (giao trong ngày). <br>
+                                - <strong>Các tỉnh thành khác:</strong> 1-3 ngày làm việc. <br>
+                                - <strong>Vùng sâu vùng xa:</strong> 3-5 ngày làm việc. <br>
+                                Đơn hàng từ 500.000đ sẽ được miễn phí giao hàng toàn quốc.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="100">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                <i class="fas fa-undo me-2"></i>Chính sách đổi trả như thế nào?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                PhuKien247 hỗ trợ đổi trả miễn phí trong các trường hợp sau: <br>
+                                - Sản phẩm bị lỗi do nhà sản xuất trong vòng 7 ngày kể từ khi nhận hàng. <br>
+                                - Sản phẩm không đúng mẫu mã, màu sắc đã đặt. <br>
+                                - Sản phẩm chưa qua sử dụng, còn nguyên tem mác và hộp. <br>
+                                Vui lòng liên hệ hotline <strong>0123 456 789</strong> để được hướng dẫn chi tiết.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="150">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                <i class="fas fa-shield-alt me-2"></i>Sản phẩm có được bảo hành không?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Tất cả sản phẩm tại PhuKien247 đều được bảo hành chính hãng theo nhà sản xuất: <br>
+                                - <strong>Phụ kiện chính hãng:</strong> Bảo hành 12 tháng. <br>
+                                - <strong>Phụ kiện thường:</strong> Bảo hành 3-6 tháng. <br>
+                                - <strong>Đổi mới 1-1:</strong> Trong 7 ngày đầu nếu phát sinh lỗi. <br>
+                                Vui lòng giữ hóa đơn và phiếu bảo hành để được hỗ trợ tốt nhất.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="200">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                <i class="fas fa-tools me-2"></i>Dịch vụ sửa chữa điện thoại có những gì?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                PhuKien247 cung cấp đầy đủ các dịch vụ sửa chữa điện thoại: <br>
+                                - Thay màn hình, thay pin, thay cảm ứng. <br>
+                                - Thay vỏ máy, ép kính, sửa main, sửa nguồn. <br>
+                                - Cứu dữ liệu, vệ sinh máy, cài lại phần mềm. <br>
+                                Tất cả linh kiện đều chính hãng, kỹ thuật viên giàu kinh nghiệm, bảo hành dịch vụ từ 3-6 tháng.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="250">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                <i class="fas fa-credit-card me-2"></i>Có những phương thức thanh toán nào?
+                            </button>
+                        </h2>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                PhuKien247 hỗ trợ nhiều phương thức thanh toán linh hoạt: <br>
+                                - <strong>COD:</strong> Thanh toán khi nhận hàng (kiểm tra trước khi thanh toán). <br>
+                                - <strong>Chuyển khoản ngân hàng:</strong> Quét mã QR hoặc chuyển khoản qua các app banking. <br>
+                                - <strong>Ví điện tử:</strong> MoMo, ZaloPay, VNPay (đang triển khai). <br>
+                                - <strong>Thẻ tín dụng/ghi nợ:</strong> Visa, Mastercard, JCB.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="300">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                                <i class="fas fa-search-location me-2"></i>Làm sao để tra cứu đơn hàng?
+                            </button>
+                        </h2>
+                        <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Bạn có thể tra cứu đơn hàng theo các cách sau: <br>
+                                - Đăng nhập vào tài khoản và vào mục "Đơn hàng của tôi". <br>
+                                - Sử dụng chức năng <a asp-controller="Tracking" asp-action="Index">Tra cứu đơn hàng</a> với mã đơn và số điện thoại. <br>
+                                - Liên hệ hotline <strong>0123 456 789</strong> để được hỗ trợ trực tiếp.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="350">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                                <i class="fas fa-percent me-2"></i>Có chương trình khuyến mãi không?
+                            </button>
+                        </h2>
+                        <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                PhuKien247 thường xuyên có các chương trình khuyến mãi hấp dẫn: <br>
+                                - Flash sale hàng tuần với giá ưu đãi đến 50%. <br>
+                                - Tích điểm thành viên đổi quà. <br>
+                                - Giảm giá cho khách hàng VIP và các dịp lễ lớn. <br>
+                                Hãy đăng ký nhận newsletter để không bỏ lỡ thông tin khuyến mãi nhé!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="400">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq9">
+                                <i class="fas fa-user-plus me-2"></i>Đăng ký tài khoản có lợi gì?
+                            </button>
+                        </h2>
+                        <div id="faq9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Khi đăng ký tài khoản tại PhuKien247, bạn sẽ được: <br>
+                                - Theo dõi và quản lý đơn hàng dễ dàng. <br>
+                                - Tích điểm và nhận ưu đãi thành viên. <br>
+                                - Tiết kiệm thời gian khi mua hàng (lưu địa chỉ, thông tin). <br>
+                                - Nhận thông báo khuyến mãi và sản phẩm mới ưu tiên.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="450">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq10">
+                                <i class="fas fa-phone-alt me-2"></i>Làm sao để liên hệ với PhuKien247?
+                            </button>
+                        </h2>
+                        <div id="faq10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Bạn có thể liên hệ với chúng tôi qua nhiều kênh: <br>
+                                - <strong>Hotline:</strong> 0123 456 789 (8:00 - 21:00 hằng ngày) <br>
+                                - <strong>Email:</strong> info@phukien247.vn <br>
+                                - <strong>Cửa hàng:</strong> 123 Nguyễn Trãi, Q.1, TP.HCM <br>
+                                - <strong>Form liên hệ:</strong> <a asp-controller="Home" asp-action="Contact">Tại đây</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-cta">
+                    <h4 class="fw-bold mb-2" style="color:#1f2937;">Vẫn còn thắc mắc?</h4>
+                    <p class="text-muted mb-3">Đội ngũ hỗ trợ của chúng tôi luôn sẵn sàng giải đáp 24/7</p>
+                    <a asp-controller="Home" asp-action="Contact" class="btn btn-pk px-4 py-2" style="border-radius:10px;font-weight:600;">
+                        <i class="fas fa-headset me-1"></i>Liên hệ ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

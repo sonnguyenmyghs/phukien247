@@ -1,0 +1,181 @@
+@{
+    ViewData["Title"] = "Báo cáo doanh thu";
+    var labels = (List<string>)ViewBag.Labels;
+    var data = (List<decimal>)ViewBag.Data;
+    var from = (DateTime)ViewBag.FromDate;
+    var to = (DateTime)ViewBag.ToDate;
+    var totalRevenue = (decimal)ViewBag.TotalRevenue;
+    var totalOrders = (int)ViewBag.TotalOrders;
+    var avg = (decimal)ViewBag.AverageOrder;
+    var details = ViewBag.Details as IEnumerable<dynamic>;
+}
+
+@section Styles {
+<style>
+    .report-stat {
+        border-radius: 14px;
+        padding: 20px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        min-height: 110px;
+    }
+    .report-stat .icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 2.6rem; opacity: 0.18; }
+    .report-stat .num { font-size: 1.6rem; font-weight: 800; }
+    .report-stat .lbl { font-size: 0.82rem; opacity: 0.9; }
+    .bg-gr-blue { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
+    .bg-gr-green { background: linear-gradient(135deg,#11998e 0%,#38ef7d 100%); }
+    .bg-gr-orange { background: linear-gradient(135deg,#FF6B35 0%,#f7971e 100%); }
+    .filter-card { background: #fff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .chart-box { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 22px; }
+    .chart-box h6 { font-weight: 700; color: #1f2937; margin-bottom: 16px; }
+    .table thead th { background: #f9fafb; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; }
+    .btn-print { background: linear-gradient(135deg,#FF6B35 0%,#f7971e 100%); color:#fff; border:none; padding: 8px 18px; border-radius: 8px; font-weight: 600; }
+    .btn-print:hover { color:#fff; opacity: 0.92; }
+    @@media print {
+        .admin-sidebar, .admin-topbar, .filter-card, .btn-print, .no-print { display: none !important; }
+        .admin-main { margin-left: 0 !important; }
+        .admin-content { padding: 10px !important; }
+    }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h4 class="fw-bold mb-0" style="color:#1f2937;"><i class="fas fa-chart-line me-2" style="color:#FF6B35;"></i>Báo cáo doanh thu</h4>
+    <button type="button" class="btn-print" onclick="window.print()"><i class="fas fa-print me-1"></i>In báo cáo</button>
+</div>
+
+<form method="get" class="filter-card mb-4 no-print">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Từ ngày</label>
+            <input type="date" name="fromDate" value="@from.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Đến ngày</label>
+            <input type="date" name="toDate" value="@to.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-pk w-100" style="background:linear-gradient(135deg,#FF6B35,#f7971e);color:#fff;border:none;border-radius:8px;padding:8px;font-weight:600;">
+                <i class="fas fa-filter me-1"></i>Lọc dữ liệu
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="mb-3 text-muted">
+    <i class="fas fa-calendar me-1"></i> Khoảng thời gian: <strong>@from.ToString("dd/MM/yyyy")</strong> - <strong>@to.ToString("dd/MM/yyyy")</strong>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-orange">
+            <i class="fas fa-coins icon"></i>
+            <div class="num">@totalRevenue.ToString("N0") đ</div>
+            <div class="lbl">Tổng doanh thu</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-green">
+            <i class="fas fa-receipt icon"></i>
+            <div class="num">@totalOrders</div>
+            <div class="lbl">Đơn hoàn thành</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-blue">
+            <i class="fas fa-chart-line icon"></i>
+            <div class="num">@avg.ToString("N0") đ</div>
+            <div class="lbl">Trung bình / đơn</div>
+        </div>
+    </div>
+</div>
+
+<div class="chart-box mb-4">
+    <h6><i class="fas fa-chart-line me-2" style="color:#FF6B35;"></i>Biểu đồ doanh thu theo ngày</h6>
+    <canvas id="revenueLineChart" height="100"></canvas>
+</div>
+
+<div class="chart-box">
+    <h6><i class="fas fa-table me-2" style="color:#FF6B35;"></i>Chi tiết doanh thu</h6>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Số đơn</th>
+                    <th class="text-end">Doanh thu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (details != null && details.Any())
+                {
+                    foreach (var d in details)
+                    {
+                        <tr>
+                            <td>@(((DateTime)d.Date).ToString("dd/MM/yyyy"))</td>
+                            <td>@d.Count</td>
+                            <td class="text-end fw-bold" style="color:#FF6B35;">@(((decimal)d.Total).ToString("N0")) đ</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="3" class="text-center text-muted py-4">Không có dữ liệu trong khoảng thời gian này</td></tr>
+                }
+            </tbody>
+            @if (details != null && details.Any())
+            {
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td>Tổng cộng</td>
+                        <td>@totalOrders</td>
+                        <td class="text-end" style="color:#FF6B35;">@totalRevenue.ToString("N0") đ</td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels));
+    const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(data));
+    new Chart(document.getElementById('revenueLineChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu (VND)',
+                data: data,
+                borderColor: '#FF6B35',
+                backgroundColor: 'rgba(255,107,53,0.15)',
+                fill: true,
+                tension: 0.35,
+                borderWidth: 3,
+                pointBackgroundColor: '#FF6B35',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ctx.parsed.y.toLocaleString('vi-VN') + ' đ'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => (v/1000000).toFixed(1) + 'M' }
+                }
+            }
+        }
+    });
+</script>
+}

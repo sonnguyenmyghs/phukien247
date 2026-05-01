@@ -14,13 +14,16 @@ public class Product
     public string? Description { get; set; }
 
     [Column(TypeName = "decimal(18,0)")]
+    [Range(0, double.MaxValue, ErrorMessage = "Giá phải >= 0")]
     public decimal Price { get; set; }
 
     [Column(TypeName = "decimal(18,0)")]
+    [Range(0, double.MaxValue)]
     public decimal? SalePrice { get; set; }
 
     public string? ImageUrl { get; set; }
 
+    [Range(0, int.MaxValue, ErrorMessage = "Số lượng phải >= 0")]
     public int Stock { get; set; }
 
     public bool IsActive { get; set; } = true;

@@ -42,6 +42,30 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult About()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult Contact()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Contact(string? name, string? email, string? phone, string? message)
+    {
+        TempData["Success"] = "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.";
+        return RedirectToAction(nameof(Contact));
+    }
+
+    public IActionResult Faq()
+    {
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

@@ -1,0 +1,204 @@
+@{
+    ViewData["Title"] = "Giới thiệu";
+}
+
+@section Styles {
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #FF6B35 0%, #f7971e 100%);
+        color: #fff; padding: 80px 0 100px; text-align: center; position: relative; overflow: hidden;
+    }
+    .about-hero::after {
+        content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 60px;
+        background: #fff; clip-path: polygon(0 100%, 100% 100%, 100% 0);
+    }
+    .about-hero h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 10px; }
+    .about-hero p { opacity: 0.92; font-size: 1.1rem; max-width: 700px; margin: 0 auto; }
+
+    .section-pad { padding: 70px 0; }
+    .section-title { font-size: 2rem; font-weight: 800; color: #1f2937; margin-bottom: 14px; }
+    .section-subtitle { color: #6b7280; font-size: 1rem; max-width: 720px; margin: 0 auto 50px; }
+
+    .feature-card {
+        background: #fff; padding: 32px 26px; border-radius: 18px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06); height: 100%;
+        transition: all 0.3s; text-align: center;
+    }
+    .feature-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(255,107,53,0.18); }
+    .feature-icon {
+        width: 70px; height: 70px; margin: 0 auto 16px; border-radius: 50%;
+        background: linear-gradient(135deg, #FF6B35, #f7971e); color: #fff;
+        display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+    }
+    .feature-card h5 { font-weight: 700; color: #1f2937; margin-bottom: 8px; }
+    .feature-card p { color: #6b7280; margin: 0; font-size: 0.92rem; }
+
+    .mission-section { background: linear-gradient(135deg,#fff7f3 0%, #ffe8db 100%); }
+
+    .mission-image {
+        background: linear-gradient(135deg,#FF6B35,#f7971e);
+        border-radius: 18px; height: 380px;
+        display: flex; align-items: center; justify-content: center; color: #fff;
+        font-size: 6rem; box-shadow: 0 12px 40px rgba(255,107,53,0.3);
+    }
+
+    .milestone-line { position: relative; padding-left: 40px; }
+    .milestone-line::before {
+        content: ''; position: absolute; left: 12px; top: 0; bottom: 0;
+        width: 3px; background: linear-gradient(180deg,#FF6B35,#f7971e);
+    }
+    .milestone-item {
+        position: relative; padding-bottom: 28px;
+    }
+    .milestone-item::before {
+        content: ''; position: absolute; left: -34px; top: 4px;
+        width: 18px; height: 18px; border-radius: 50%;
+        background: #FF6B35; border: 4px solid #fff;
+        box-shadow: 0 0 0 2px #FF6B35;
+    }
+    .milestone-year { color: #FF6B35; font-weight: 800; font-size: 1.1rem; }
+    .milestone-title { font-weight: 700; color: #1f2937; margin: 4px 0 4px; }
+    .milestone-desc { color: #6b7280; font-size: 0.92rem; }
+
+    .stat-counter {
+        background: #fff; padding: 28px 18px; border-radius: 18px;
+        text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .stat-counter .num {
+        font-size: 2.4rem; font-weight: 800;
+        background: linear-gradient(135deg,#FF6B35,#f7971e);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-counter .lbl { color: #6b7280; font-weight: 600; font-size: 0.88rem; }
+</style>
+}
+
+<section class="about-hero">
+    <div class="container">
+        <h1><i class="fas fa-store me-2"></i>Về PhuKien247</h1>
+        <p>Hơn 5 năm đồng hành cùng khách hàng Việt - chuyên cung cấp phụ kiện điện thoại chính hãng và dịch vụ sửa chữa uy tín.</p>
+    </div>
+</section>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="mission-image">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <h2 class="section-title">Câu chuyện của chúng tôi</h2>
+                <p style="color:#4b5563;line-height:1.8;">
+                    PhuKien247 được thành lập năm 2020 với sứ mệnh mang đến cho người Việt những sản phẩm phụ kiện điện thoại
+                    chất lượng cao, chính hãng, với mức giá hợp lý nhất. Trải qua 5 năm phát triển, chúng tôi tự hào là đối tác
+                    tin cậy của hàng chục nghìn khách hàng trên toàn quốc.
+                </p>
+                <p style="color:#4b5563;line-height:1.8;">
+                    Bên cạnh việc kinh doanh phụ kiện, chúng tôi còn cung cấp dịch vụ sửa chữa điện thoại chuyên nghiệp với đội
+                    ngũ kỹ thuật viên giàu kinh nghiệm, linh kiện chính hãng và quy trình minh bạch.
+                </p>
+                <div class="row g-3 mt-3">
+                    <div class="col-6 col-md-4"><div class="stat-counter"><div class="num">10K+</div><div class="lbl">Khách hàng</div></div></div>
+                    <div class="col-6 col-md-4"><div class="stat-counter"><div class="num">500+</div><div class="lbl">Sản phẩm</div></div></div>
+                    <div class="col-6 col-md-4"><div class="stat-counter"><div class="num">5+</div><div class="lbl">Năm kinh nghiệm</div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad mission-section">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-title">Vì sao chọn PhuKien247?</h2>
+            <p class="section-subtitle">Chúng tôi cam kết mang đến trải nghiệm mua sắm và sử dụng dịch vụ tốt nhất cho bạn.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+                    <h5>Chính hãng 100%</h5>
+                    <p>Tất cả sản phẩm đều được nhập khẩu chính hãng, có đầy đủ giấy tờ chứng nhận.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shipping-fast"></i></div>
+                    <h5>Giao hàng nhanh</h5>
+                    <p>Giao hàng toàn quốc 1-3 ngày, miễn phí ship cho đơn từ 500.000đ.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h5>Bảo hành dài hạn</h5>
+                    <p>Bảo hành chính hãng 12 tháng, đổi mới 1-1 trong 7 ngày đầu.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <h5>Hỗ trợ 24/7</h5>
+                    <p>Đội ngũ chăm sóc khách hàng luôn sẵn sàng giải đáp mọi thắc mắc.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-title">Hành trình phát triển</h2>
+            <p class="section-subtitle">Những cột mốc đáng nhớ trên con đường phát triển của PhuKien247.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="milestone-line">
+                    <div class="milestone-item">
+                        <div class="milestone-year">2020</div>
+                        <div class="milestone-title">Thành lập PhuKien247</div>
+                        <div class="milestone-desc">Khởi đầu với cửa hàng nhỏ tại Quận 1, TP.HCM, chuyên kinh doanh phụ kiện điện thoại.</div>
+                    </div>
+                    <div class="milestone-item">
+                        <div class="milestone-year">2021</div>
+                        <div class="milestone-title">Mở rộng dịch vụ sửa chữa</div>
+                        <div class="milestone-desc">Triển khai trung tâm sửa chữa điện thoại với đội ngũ kỹ thuật viên chuyên nghiệp.</div>
+                    </div>
+                    <div class="milestone-item">
+                        <div class="milestone-year">2023</div>
+                        <div class="milestone-title">Ra mắt website thương mại điện tử</div>
+                        <div class="milestone-desc">Chính thức bán hàng online, phục vụ khách hàng toàn quốc với hệ thống giao hàng nhanh.</div>
+                    </div>
+                    <div class="milestone-item">
+                        <div class="milestone-year">2025</div>
+                        <div class="milestone-title">Đối tác chính thức của các thương hiệu lớn</div>
+                        <div class="milestone-desc">Trở thành đối tác phân phối chính thức của Apple, Samsung, Xiaomi tại Việt Nam.</div>
+                    </div>
+                    <div class="milestone-item">
+                        <div class="milestone-year">2026</div>
+                        <div class="milestone-title">Vươn tầm khu vực</div>
+                        <div class="milestone-desc">Mở rộng quy mô lên hơn 500 sản phẩm, phục vụ trên 10.000 khách hàng thân thiết.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad mission-section">
+    <div class="container text-center">
+        <h2 class="section-title">Sẵn sàng trải nghiệm dịch vụ?</h2>
+        <p class="section-subtitle">Liên hệ ngay với chúng tôi để được tư vấn miễn phí.</p>
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <a asp-controller="Product" asp-action="Index" class="btn btn-pk px-4 py-2" style="border-radius:10px;font-weight:600;">
+                <i class="fas fa-shopping-bag me-1"></i>Mua sắm ngay
+            </a>
+            <a asp-controller="Home" asp-action="Contact" class="btn btn-pk-outline px-4 py-2" style="border-radius:10px;font-weight:600;">
+                <i class="fas fa-envelope me-1"></i>Liên hệ ngay
+            </a>
+        </div>
+    </div>
+</section>

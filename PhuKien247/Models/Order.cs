@@ -27,6 +27,7 @@ public class Order
     public ApplicationUser User { get; set; } = null!;
 
     [Column(TypeName = "decimal(18,0)")]
+    [Range(0, double.MaxValue)]
     public decimal TotalAmount { get; set; }
 
     public OrderStatus Status { get; set; } = OrderStatus.ChoXacNhan;
@@ -37,6 +38,7 @@ public class Order
     public string ShippingAddress { get; set; } = string.Empty;
 
     [MaxLength(20)]
+    [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
     public string PhoneNumber { get; set; } = string.Empty;
 
     [MaxLength(500)]

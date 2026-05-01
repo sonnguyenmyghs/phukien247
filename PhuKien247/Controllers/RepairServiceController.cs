@@ -26,6 +26,24 @@ public class RepairServiceController : Controller
     }
 
     [Authorize]
+    public async Task<IActionResult> MyBookings()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Challenge();
+        }
+
+        var bookings = await _context.RepairBookings
+            .Include(b => b.Service)
+            .Where(b => b.UserId == userId)
+            .OrderByDescending(b => b.CreatedAt)
+            .ToListAsync();
+
+        return View(bookings);
+    }
+
+    [Authorize]
     public async Task<IActionResult> Book(int serviceId)
     {
         var service = await _context.RepairServices.FindAsync(serviceId);

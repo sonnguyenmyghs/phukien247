@@ -17,13 +17,48 @@ public class RepairBookingController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search, int? status, DateTime? fromDate, DateTime? toDate)
     {
-        var bookings = await _context.RepairBookings
+        var query = _context.RepairBookings
             .Include(b => b.User)
             .Include(b => b.Service)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(b =>
+                (b.User.FullName != null && b.User.FullName.Contains(search)) ||
+                b.DeviceInfo.Contains(search) ||
+                b.Service.Name.Contains(search));
+        }
+
+        if (status.HasValue)
+        {
+            var st = (RepairStatus)status.Value;
+            query = query.Where(b => b.Status == st);
+        }
+
+        if (fromDate.HasValue)
+        {
+            var from = fromDate.Value.Date;
+            query = query.Where(b => b.BookingDate >= from);
+        }
+
+        if (toDate.HasValue)
+        {
+            var to = toDate.Value.Date.AddDays(1);
+            query = query.Where(b => b.BookingDate < to);
+        }
+
+        var bookings = await query
             .OrderByDescending(b => b.CreatedAt)
             .ToListAsync();
+
+        ViewBag.Search = search;
+        ViewBag.Status = status;
+        ViewBag.FromDate = fromDate;
+        ViewBag.ToDate = toDate;
+
         return View(bookings);
     }
 

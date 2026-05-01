@@ -18,13 +18,38 @@ public class ProductController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search, int? categoryId, int? brandId)
     {
-        var products = await _context.Products
+        var query = _context.Products
             .Include(p => p.Category)
             .Include(p => p.Brand)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.Name.Contains(search) || (p.Description != null && p.Description.Contains(search)));
+        }
+
+        if (categoryId.HasValue)
+        {
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+        }
+
+        if (brandId.HasValue)
+        {
+            query = query.Where(p => p.BrandId == brandId.Value);
+        }
+
+        var products = await query
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+
+        ViewBag.Search = search;
+        ViewBag.CategoryId = categoryId;
+        ViewBag.BrandId = brandId;
+        ViewBag.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+        ViewBag.Brands = await _context.Brands.OrderBy(b => b.Name).ToListAsync();
+
         return View(products);
     }
 

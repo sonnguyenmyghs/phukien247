@@ -17,12 +17,47 @@ public class OrderController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search, int? status, DateTime? fromDate, DateTime? toDate)
     {
-        var orders = await _context.Orders
+        var query = _context.Orders
             .Include(o => o.User)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(o =>
+                o.PhoneNumber.Contains(search) ||
+                (o.User.FullName != null && o.User.FullName.Contains(search)) ||
+                o.Id.ToString().Contains(search));
+        }
+
+        if (status.HasValue)
+        {
+            var st = (OrderStatus)status.Value;
+            query = query.Where(o => o.Status == st);
+        }
+
+        if (fromDate.HasValue)
+        {
+            var from = fromDate.Value.Date;
+            query = query.Where(o => o.CreatedAt >= from);
+        }
+
+        if (toDate.HasValue)
+        {
+            var to = toDate.Value.Date.AddDays(1);
+            query = query.Where(o => o.CreatedAt < to);
+        }
+
+        var orders = await query
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
+
+        ViewBag.Search = search;
+        ViewBag.Status = status;
+        ViewBag.FromDate = fromDate;
+        ViewBag.ToDate = toDate;
+
         return View(orders);
     }
 

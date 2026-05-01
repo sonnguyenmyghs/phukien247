@@ -1,0 +1,163 @@
+@using PhuKien247.Areas.Admin.Controllers
+@model List<RevenueByCategoryItem>
+@{
+    ViewData["Title"] = "Doanh thu theo danh mục";
+    var labels = (List<string>)ViewBag.Labels;
+    var revenues = (List<decimal>)ViewBag.Revenues;
+    var from = (DateTime)ViewBag.FromDate;
+    var to = (DateTime)ViewBag.ToDate;
+    var totalRevenue = (decimal)ViewBag.TotalRevenue;
+    var totalCategories = (int)ViewBag.TotalCategories;
+}
+
+@section Styles {
+<style>
+    .report-stat { border-radius: 14px; padding: 20px; color: #fff; position: relative; overflow: hidden; min-height: 110px; }
+    .report-stat .icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 2.6rem; opacity: 0.18; }
+    .report-stat .num { font-size: 1.6rem; font-weight: 800; }
+    .report-stat .lbl { font-size: 0.82rem; opacity: 0.9; }
+    .bg-gr-orange { background: linear-gradient(135deg,#FF6B35 0%,#f7971e 100%); }
+    .bg-gr-green { background: linear-gradient(135deg,#11998e 0%,#38ef7d 100%); }
+    .bg-gr-blue { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
+    .filter-card { background: #fff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .chart-box { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 22px; }
+    .chart-box h6 { font-weight: 700; color: #1f2937; margin-bottom: 16px; }
+    .btn-print { background: linear-gradient(135deg,#FF6B35,#f7971e); color:#fff; border:none; padding:8px 18px; border-radius:8px; font-weight:600; }
+    .btn-print:hover { color:#fff; opacity: 0.92; }
+    .progress-bar-pk { background: linear-gradient(90deg,#FF6B35,#f7971e); }
+    @@media print {
+        .admin-sidebar, .admin-topbar, .filter-card, .btn-print, .no-print { display: none !important; }
+        .admin-main { margin-left: 0 !important; }
+    }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h4 class="fw-bold mb-0" style="color:#1f2937;"><i class="fas fa-chart-pie me-2" style="color:#FF6B35;"></i>Doanh thu theo danh mục</h4>
+    <button type="button" class="btn-print" onclick="window.print()"><i class="fas fa-print me-1"></i>In báo cáo</button>
+</div>
+
+<form method="get" class="filter-card mb-4 no-print">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Từ ngày</label>
+            <input type="date" name="fromDate" value="@from.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Đến ngày</label>
+            <input type="date" name="toDate" value="@to.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn w-100" style="background:linear-gradient(135deg,#FF6B35,#f7971e);color:#fff;border:none;border-radius:8px;padding:8px;font-weight:600;">
+                <i class="fas fa-filter me-1"></i>Lọc dữ liệu
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="mb-3 text-muted">
+    <i class="fas fa-calendar me-1"></i> Khoảng thời gian: <strong>@from.ToString("dd/MM/yyyy")</strong> - <strong>@to.ToString("dd/MM/yyyy")</strong>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-orange">
+            <i class="fas fa-coins icon"></i>
+            <div class="num">@totalRevenue.ToString("N0") đ</div>
+            <div class="lbl">Tổng doanh thu</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-green">
+            <i class="fas fa-layer-group icon"></i>
+            <div class="num">@totalCategories</div>
+            <div class="lbl">Danh mục có doanh thu</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-blue">
+            <i class="fas fa-cubes icon"></i>
+            <div class="num">@Model.Sum(m => m.TotalQuantity)</div>
+            <div class="lbl">Tổng sản phẩm bán</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-5">
+        <div class="chart-box">
+            <h6><i class="fas fa-chart-pie me-2" style="color:#FF6B35;"></i>Tỷ lệ doanh thu</h6>
+            <canvas id="categoryPieChart" height="260"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="chart-box">
+            <h6><i class="fas fa-table me-2" style="color:#FF6B35;"></i>Chi tiết theo danh mục</h6>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead style="background:#f9fafb;">
+                        <tr>
+                            <th>Danh mục</th>
+                            <th class="text-center">SL</th>
+                            <th class="text-end">Doanh thu</th>
+                            <th>Tỷ lệ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            foreach (var c in Model)
+                            {
+                                var percent = totalRevenue > 0 ? (double)(c.TotalRevenue / totalRevenue) * 100 : 0;
+                                <tr>
+                                    <td class="fw-semibold">@c.CategoryName</td>
+                                    <td class="text-center">@c.TotalQuantity</td>
+                                    <td class="text-end fw-bold" style="color:#FF6B35;">@c.TotalRevenue.ToString("N0") đ</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height:8px;">
+                                                <div class="progress-bar progress-bar-pk" style="width:@percent.ToString("F1")%"></div>
+                                            </div>
+                                            <small class="text-muted">@percent.ToString("F1")%</small>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">Không có dữ liệu trong khoảng thời gian này</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels));
+    const revenues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenues));
+    const colors = ['#FF6B35','#f7971e','#11998e','#38ef7d','#667eea','#764ba2','#a855f7','#ec4899','#3b82f6','#06b6d4','#eb3349','#f59e0b'];
+    new Chart(document.getElementById('categoryPieChart'), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: revenues,
+                backgroundColor: colors.slice(0, labels.length),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, font: { size: 12 } } },
+                tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed.toLocaleString('vi-VN') + ' đ' } }
+            }
+        }
+    });
+</script>
+}

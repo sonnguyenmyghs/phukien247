@@ -1,6 +1,11 @@
 @model List<Product>
 @{
-    ViewData["Title"] = "Quan ly san pham";
+    ViewData["Title"] = "Quản lý sản phẩm";
+    var search = ViewBag.Search as string;
+    int? selectedCategoryId = ViewBag.CategoryId;
+    int? selectedBrandId = ViewBag.BrandId;
+    var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+    var brands = ViewBag.Brands as List<Brand> ?? new List<Brand>();
 }
 
 @section Styles {
@@ -106,14 +111,57 @@
 <!-- Search/Filter Bar -->
 <div class="card mb-4" style="border-radius:12px;">
     <div class="card-body py-3">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="search-bar position-relative">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Tim kiem san pham..." onkeyup="filterProducts()" />
+        <form asp-area="Admin" asp-controller="Product" asp-action="Index" method="get">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="search-bar position-relative">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" name="search" value="@search" class="form-control" placeholder="Tìm kiếm theo tên hoặc mô tả..." />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="categoryId" class="form-select" style="border-radius:10px;padding:10px 14px;">
+                        <option value="">Tất cả danh mục</option>
+                        @foreach (var cat in categories)
+                        {
+                            if (selectedCategoryId == cat.Id)
+                            {
+                                <option value="@cat.Id" selected>@cat.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@cat.Id">@cat.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="brandId" class="form-select" style="border-radius:10px;padding:10px 14px;">
+                        <option value="">Tất cả hãng</option>
+                        @foreach (var br in brands)
+                        {
+                            if (selectedBrandId == br.Id)
+                            {
+                                <option value="@br.Id" selected>@br.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@br.Id">@br.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn flex-fill" style="background:#FF6B35;color:#fff;border-radius:10px;font-weight:600;">
+                        <i class="fas fa-search me-1"></i>Tìm
+                    </button>
+                    <a asp-area="Admin" asp-controller="Product" asp-action="Index"
+                       class="btn btn-outline-secondary" style="border-radius:10px;font-weight:600;" title="Xóa bộ lọc">
+                        <i class="fas fa-undo"></i>
+                    </a>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -228,15 +276,3 @@
     </div>
 </div>
 
-@section Scripts {
-<script>
-    function filterProducts() {
-        var input = document.getElementById('searchInput').value.toLowerCase();
-        var rows = document.querySelectorAll('#productTable tbody tr');
-        rows.forEach(function(row) {
-            var text = row.textContent.toLowerCase();
-            row.style.display = text.indexOf(input) > -1 ? '' : 'none';
-        });
-    }
-</script>
-}

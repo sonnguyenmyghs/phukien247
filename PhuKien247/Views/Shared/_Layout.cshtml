@@ -245,6 +245,55 @@
         }
 
         /* ============================================
+           NAVBAR SEARCH
+           ============================================ */
+        .nav-search {
+            position: relative;
+            max-width: 280px;
+        }
+        .nav-search input {
+            border-radius: 50px;
+            border: 1.5px solid #e5e7eb;
+            background: #f9fafb;
+            padding: 0.5rem 2.4rem 0.5rem 1rem;
+            font-size: 0.88rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .nav-search input:focus {
+            outline: none;
+            border-color: var(--pk-orange);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+        .nav-search button {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: var(--pk-gradient);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-search button:hover {
+            box-shadow: 0 4px 12px rgba(255,107,53,0.35);
+        }
+        @@media (max-width: 991.98px) {
+            .nav-search {
+                max-width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+
+        /* ============================================
            BUTTONS
            ============================================ */
         .btn-pk {
@@ -586,12 +635,33 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="Tracking" asp-action="Index">
+                            <i class="fas fa-search-location me-1"></i>Tra c&#7913;u
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-headset me-1"></i>H&#7895; tr&#7907;
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" asp-controller="Home" asp-action="About"><i class="fas fa-info-circle me-2"></i>Gi&#7899;i thi&#7879;u</a></li>
+                            <li><a class="dropdown-item" asp-controller="Home" asp-action="Faq"><i class="fas fa-question-circle me-2"></i>C&acirc;u h&#7887;i th&#432;&#7901;ng g&#7863;p</a></li>
+                            <li><a class="dropdown-item" asp-controller="Home" asp-action="Contact"><i class="fas fa-envelope me-2"></i>Li&ecirc;n h&#7879;</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link cart-link" asp-controller="Cart" asp-action="Index">
                             <i class="fas fa-shopping-cart me-1"></i>Gi&#7887; h&agrave;ng
                             <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
                         </a>
                     </li>
                 </ul>
+
+                <!-- Global Search -->
+                <form class="nav-search me-lg-3" method="get" asp-controller="Product" asp-action="Index" role="search">
+                    <input type="text" name="search" class="form-control" placeholder="T&igrave;m s&#7843;n ph&#7849;m..." autocomplete="off" />
+                    <button type="submit" title="T&igrave;m ki&#7871;m"><i class="fas fa-search"></i></button>
+                </form>
 
                 <div class="d-flex align-items-center gap-2">
                     @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -608,13 +678,23 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
-                                    <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                        <i class="fas fa-id-card me-2"></i>T&agrave;i kho&#7843;n
+                                    <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
+                                        <i class="fas fa-id-card me-2"></i>H&#7891; s&#417; c&#7911;a t&ocirc;i
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Profile" asp-action="ChangePassword">
+                                        <i class="fas fa-key me-2"></i>&#272;&#7893;i m&#7853;t kh&#7849;u
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" asp-controller="Order" asp-action="MyOrders">
                                         <i class="fas fa-clipboard-list me-2"></i>&#272;&#417;n h&agrave;ng
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="RepairService" asp-action="MyBookings">
+                                        <i class="fas fa-tools me-2"></i>L&#7883;ch s&#7917;a c&#7911;a t&ocirc;i
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
@@ -668,6 +748,11 @@
                         <li class="mb-2"><a asp-controller="Home" asp-action="Index"><i class="fas fa-chevron-right me-1 small"></i>Trang ch&#7911;</a></li>
                         <li class="mb-2"><a asp-controller="Product" asp-action="Index"><i class="fas fa-chevron-right me-1 small"></i>S&#7843;n ph&#7849;m</a></li>
                         <li class="mb-2"><a asp-controller="RepairService" asp-action="Index"><i class="fas fa-chevron-right me-1 small"></i>S&#7917;a ch&#7919;a</a></li>
+                        <li class="mb-2"><a asp-controller="Tracking" asp-action="Index"><i class="fas fa-chevron-right me-1 small"></i>Tra c&#7913;u &#273;&#417;n h&agrave;ng</a></li>
+                        <li class="mb-2"><a asp-controller="Tracking" asp-action="RepairLookup"><i class="fas fa-chevron-right me-1 small"></i>Tra c&#7913;u l&#7883;ch s&#7917;a</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="About"><i class="fas fa-chevron-right me-1 small"></i>Gi&#7899;i thi&#7879;u</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Faq"><i class="fas fa-chevron-right me-1 small"></i>C&acirc;u h&#7887;i th&#432;&#7901;ng g&#7863;p</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Contact"><i class="fas fa-chevron-right me-1 small"></i>Li&ecirc;n h&#7879;</a></li>
                         <li class="mb-2"><a asp-controller="Home" asp-action="Privacy"><i class="fas fa-chevron-right me-1 small"></i>Ch&iacute;nh s&aacute;ch</a></li>
                     </ul>
                 </div>

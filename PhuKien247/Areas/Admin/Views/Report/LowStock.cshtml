@@ -1,0 +1,119 @@
+@model List<Product>
+@{
+    ViewData["Title"] = "Sản phẩm tồn kho thấp";
+    var totalLow = (int)ViewBag.TotalLow;
+    var totalOut = (int)ViewBag.TotalOut;
+    var totalUnder5 = (int)ViewBag.TotalUnder5;
+}
+
+@section Styles {
+<style>
+    .report-stat { border-radius: 14px; padding: 20px; color: #fff; position: relative; overflow: hidden; min-height: 110px; }
+    .report-stat .icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 2.6rem; opacity: 0.18; }
+    .report-stat .num { font-size: 1.6rem; font-weight: 800; }
+    .report-stat .lbl { font-size: 0.82rem; opacity: 0.9; }
+    .bg-gr-orange { background: linear-gradient(135deg,#FF6B35 0%,#f7971e 100%); }
+    .bg-gr-red { background: linear-gradient(135deg,#eb3349 0%,#f45c43 100%); }
+    .bg-gr-yellow { background: linear-gradient(135deg,#f59e0b 0%,#fbbf24 100%); }
+    .chart-box { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 22px; }
+    .chart-box h6 { font-weight: 700; color: #1f2937; margin-bottom: 16px; }
+    .product-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+    .stock-pill { padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+    .stock-out { background: #fee2e2; color: #b91c1c; }
+    .stock-low { background: #fef3c7; color: #b45309; }
+    .stock-mid { background: #fff7ed; color: #c2410c; }
+    .btn-print { background: linear-gradient(135deg,#FF6B35,#f7971e); color:#fff; border:none; padding:8px 18px; border-radius:8px; font-weight:600; }
+    .btn-print:hover { color:#fff; opacity: 0.92; }
+    @@media print {
+        .admin-sidebar, .admin-topbar, .btn-print, .no-print { display: none !important; }
+        .admin-main { margin-left: 0 !important; }
+    }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h4 class="fw-bold mb-0" style="color:#1f2937;"><i class="fas fa-exclamation-triangle me-2" style="color:#FF6B35;"></i>Sản phẩm tồn kho thấp (&lt; 10)</h4>
+    <button type="button" class="btn-print" onclick="window.print()"><i class="fas fa-print me-1"></i>In báo cáo</button>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-red">
+            <i class="fas fa-times-circle icon"></i>
+            <div class="num">@totalOut</div>
+            <div class="lbl">Hết hàng (= 0)</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-yellow">
+            <i class="fas fa-exclamation icon"></i>
+            <div class="num">@totalUnder5</div>
+            <div class="lbl">Sắp hết (1 - 4)</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="report-stat bg-gr-orange">
+            <i class="fas fa-box-open icon"></i>
+            <div class="num">@totalLow</div>
+            <div class="lbl">Tổng sản phẩm tồn thấp</div>
+        </div>
+    </div>
+</div>
+
+<div class="chart-box">
+    <h6><i class="fas fa-table me-2" style="color:#FF6B35;"></i>Danh sách sản phẩm cần nhập thêm</h6>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background:#f9fafb;">
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Thương hiệu</th>
+                    <th class="text-end">Giá</th>
+                    <th class="text-center">Tồn kho</th>
+                    <th class="text-center no-print">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var p in Model)
+                    {
+                        var pillCls = p.Stock == 0 ? "stock-out" : (p.Stock < 5 ? "stock-low" : "stock-mid");
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (!string.IsNullOrEmpty(p.ImageUrl))
+                                    {
+                                        <img src="@p.ImageUrl" class="product-img" alt="@p.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-img bg-light d-flex align-items-center justify-content-center"><i class="fas fa-image text-muted"></i></div>
+                                    }
+                                    <div>
+                                        <div class="fw-semibold">@p.Name</div>
+                                        <small class="text-muted">ID: @p.Id</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@p.Category?.Name</td>
+                            <td>@p.Brand?.Name</td>
+                            <td class="text-end">@p.Price.ToString("N0") đ</td>
+                            <td class="text-center"><span class="stock-pill @pillCls">@p.Stock</span></td>
+                            <td class="text-center no-print">
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary" style="border-radius:8px;">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-check-circle me-1"></i> Tất cả sản phẩm đều có tồn kho đủ</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

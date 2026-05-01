@@ -1,6 +1,10 @@
 @model List<RepairBooking>
 @{
     ViewData["Title"] = "Quản lý lịch sửa chữa";
+    var search = ViewBag.Search as string;
+    int? selectedStatus = ViewBag.Status;
+    DateTime? fromDate = ViewBag.FromDate;
+    DateTime? toDate = ViewBag.ToDate;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -9,6 +13,44 @@
         <p class="text-muted mb-0">Theo dõi và cập nhật trạng thái các lịch hẹn sửa chữa</p>
     </div>
     <span class="badge bg-primary fs-6">@Model.Count lịch hẹn</span>
+</div>
+
+<!-- Filter Bar -->
+<div class="card mb-4 border-0 shadow-sm" style="border-radius:12px;">
+    <div class="card-body py-3">
+        <form asp-area="Admin" asp-controller="RepairBooking" asp-action="Index" method="get">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <input type="text" name="search" value="@search" class="form-control" placeholder="Tìm khách hàng, thiết bị, dịch vụ..." style="border-radius:10px;" />
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select" style="border-radius:10px;">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="0" selected="@(selectedStatus == 0)">Chờ xác nhận</option>
+                        <option value="1" selected="@(selectedStatus == 1)">Đã tiếp nhận</option>
+                        <option value="2" selected="@(selectedStatus == 2)">Đang sửa</option>
+                        <option value="3" selected="@(selectedStatus == 3)">Hoàn thành</option>
+                        <option value="4" selected="@(selectedStatus == 4)">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="fromDate" value="@(fromDate?.ToString("yyyy-MM-dd"))" class="form-control" style="border-radius:10px;" />
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="toDate" value="@(toDate?.ToString("yyyy-MM-dd"))" class="form-control" style="border-radius:10px;" />
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn flex-fill text-white" style="background:linear-gradient(135deg,#FF6B35,#e55a26);border-radius:10px;font-weight:600;">
+                        <i class="fas fa-search me-1"></i>Lọc
+                    </button>
+                    <a asp-area="Admin" asp-controller="RepairBooking" asp-action="Index"
+                       class="btn btn-outline-secondary" style="border-radius:10px;font-weight:600;">
+                        <i class="fas fa-undo me-1"></i>Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">

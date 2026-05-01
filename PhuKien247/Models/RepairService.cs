@@ -14,6 +14,7 @@ public class RepairService
     public string? Description { get; set; }
 
     [Column(TypeName = "decimal(18,0)")]
+    [Range(0, double.MaxValue)]
     public decimal Price { get; set; }
 
     [MaxLength(100)]

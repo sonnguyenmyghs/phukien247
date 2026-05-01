@@ -1,6 +1,10 @@
 @model List<Order>
 @{
-    ViewData["Title"] = "Quan ly don hang";
+    ViewData["Title"] = "Quản lý đơn hàng";
+    var search = ViewBag.Search as string;
+    int? selectedStatus = ViewBag.Status;
+    DateTime? fromDate = ViewBag.FromDate;
+    DateTime? toDate = ViewBag.ToDate;
 }
 
 @section Styles {
@@ -79,17 +83,38 @@
 <!-- Filter Bar -->
 <div class="card mb-4" style="border-radius:12px;">
     <div class="card-body py-3">
-        <div class="d-flex align-items-center gap-3 flex-wrap">
-            <span class="fw-semibold text-muted" style="font-size:0.85rem;"><i class="fas fa-filter me-1"></i> Loc:</span>
-            <select id="statusFilter" class="filter-select" onchange="filterByStatus()">
-                <option value="">Tat ca trang thai</option>
-                <option value="Cho xac nhan">Cho xac nhan</option>
-                <option value="Da xac nhan">Da xac nhan</option>
-                <option value="Dang giao">Dang giao</option>
-                <option value="Hoan thanh">Hoan thanh</option>
-                <option value="Da huy">Da huy</option>
-            </select>
-        </div>
+        <form asp-area="Admin" asp-controller="Order" asp-action="Index" method="get">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <input type="text" name="search" value="@search" class="filter-select w-100" placeholder="Tìm theo SĐT, tên KH, mã ĐH..." />
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="filter-select w-100">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="0" selected="@(selectedStatus == 0)">Chờ xác nhận</option>
+                        <option value="1" selected="@(selectedStatus == 1)">Đã xác nhận</option>
+                        <option value="2" selected="@(selectedStatus == 2)">Đang giao</option>
+                        <option value="3" selected="@(selectedStatus == 3)">Hoàn thành</option>
+                        <option value="4" selected="@(selectedStatus == 4)">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="fromDate" value="@(fromDate?.ToString("yyyy-MM-dd"))" class="filter-select w-100" placeholder="Từ ngày" />
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="toDate" value="@(toDate?.ToString("yyyy-MM-dd"))" class="filter-select w-100" placeholder="Đến ngày" />
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn flex-fill" style="background:#FF6B35;color:#fff;border-radius:10px;font-weight:600;padding:8px 14px;">
+                        <i class="fas fa-search me-1"></i>Lọc
+                    </button>
+                    <a asp-area="Admin" asp-controller="Order" asp-action="Index"
+                       class="btn btn-outline-secondary" style="border-radius:10px;font-weight:600;padding:8px 14px;">
+                        <i class="fas fa-undo me-1"></i>Reset
+                    </a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -172,22 +197,3 @@
     </div>
 </div>
 
-@section Scripts {
-<script>
-    function filterByStatus() {
-        var filter = document.getElementById('statusFilter').value.toLowerCase();
-        var rows = document.querySelectorAll('#orderTable tbody tr');
-        rows.forEach(function(row) {
-            if (!filter) {
-                row.style.display = '';
-                return;
-            }
-            var statusCell = row.querySelector('.status-badge');
-            if (statusCell) {
-                var statusText = statusCell.textContent.trim().toLowerCase();
-                row.style.display = statusText.indexOf(filter) > -1 ? '' : 'none';
-            }
-        });
-    }
-</script>
-}

@@ -1,0 +1,280 @@
+@{
+    ViewData["Title"] = "Tra cứu lịch sửa chữa";
+    var booking = ViewBag.Booking as RepairBooking;
+    var error = ViewBag.Error as string;
+    var bookingId = ViewBag.BookingId as int? ?? 0;
+    var phoneNumber = ViewBag.PhoneNumber as string;
+
+    string RepairStatusText(RepairStatus s) => s switch
+    {
+        RepairStatus.ChoXacNhan => "Chờ xác nhận",
+        RepairStatus.DaTiepNhan => "Đã tiếp nhận",
+        RepairStatus.DangSua => "Đang sửa",
+        RepairStatus.HoanThanh => "Hoàn thành",
+        RepairStatus.DaHuy => "Đã hủy",
+        _ => s.ToString()
+    };
+
+    string RepairStatusBadge(RepairStatus s) => s switch
+    {
+        RepairStatus.ChoXacNhan => "bg-warning text-dark",
+        RepairStatus.DaTiepNhan => "bg-info",
+        RepairStatus.DangSua => "bg-primary",
+        RepairStatus.HoanThanh => "bg-success",
+        RepairStatus.DaHuy => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+@section Styles {
+<style>
+    .tracking-hero {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        padding: 3rem 0 2rem;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .tracking-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: rgba(255,107,53,0.08);
+    }
+    .tracking-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        padding: 2rem;
+        margin-top: -2rem;
+        position: relative;
+        z-index: 2;
+    }
+    .tracking-form input {
+        border-radius: 10px;
+        padding: 0.7rem 1rem;
+        border: 1.5px solid #e5e7eb;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    .tracking-form input:focus {
+        border-color: #FF6B35;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+    }
+    .btn-track {
+        background: linear-gradient(135deg, #FF6B35, #e55a26);
+        color: #fff;
+        border: none;
+        padding: 0.7rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-track:hover {
+        box-shadow: 0 6px 20px rgba(255,107,53,0.35);
+        transform: translateY(-2px);
+        color: #fff;
+    }
+    .timeline {
+        display: flex;
+        justify-content: space-between;
+        margin: 2rem 0;
+        position: relative;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 22px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #e5e7eb;
+        z-index: 0;
+    }
+    .timeline-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+    .timeline-step .step-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.5rem;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    .timeline-step.active .step-icon {
+        background: linear-gradient(135deg, #FF6B35, #e55a26);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(255,107,53,0.35);
+    }
+    .timeline-step .step-label {
+        font-size: 0.82rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    .timeline-step.active .step-label {
+        color: #1f2937;
+        font-weight: 600;
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-row .label {
+        color: #6b7280;
+        font-size: 0.88rem;
+    }
+    .info-row .value {
+        font-weight: 600;
+        color: #1f2937;
+    }
+</style>
+}
+
+<section class="tracking-hero">
+    <div class="container text-center">
+        <h1 class="fw-bold"><i class="fas fa-tools me-2"></i>Tra cứu lịch sửa chữa</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,0.75);">Nhập mã lịch hẹn và số điện thoại để theo dõi tiến độ sửa chữa</p>
+    </div>
+</section>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="tracking-card">
+                <form method="post" asp-action="RepairLookup" class="tracking-form">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold"><i class="fas fa-hashtag me-1" style="color:#FF6B35;"></i>Mã lịch hẹn</label>
+                            <input type="number" name="bookingId" value="@(bookingId > 0 ? bookingId.ToString() : "")" class="form-control" placeholder="Ví dụ: 12" required />
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold"><i class="fas fa-phone me-1" style="color:#FF6B35;"></i>Số điện thoại</label>
+                            <input type="text" name="phoneNumber" value="@phoneNumber" class="form-control" placeholder="Số điện thoại đăng ký tài khoản" required />
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn-track w-100">
+                                <i class="fas fa-search me-1"></i>Tra cứu
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-danger mt-4 mb-0" style="border-radius:10px;">
+                        <i class="fas fa-exclamation-circle me-1"></i>@error
+                    </div>
+                }
+            </div>
+
+            @if (booking != null)
+            {
+                var isCancelled = booking.Status == RepairStatus.DaHuy;
+                var step = (int)booking.Status;
+
+                <div class="tracking-card mt-4">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
+                        <div>
+                            <h4 class="fw-bold mb-1">Lịch sửa #@booking.Id</h4>
+                            <p class="text-muted mb-0" style="font-size:0.88rem;">
+                                <i class="far fa-clock me-1"></i>Đặt ngày @booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </p>
+                        </div>
+                        <span class="badge @RepairStatusBadge(booking.Status)" style="font-size:0.9rem;padding:0.5rem 1rem;border-radius:20px;">
+                            @RepairStatusText(booking.Status)
+                        </span>
+                    </div>
+
+                    @if (!isCancelled)
+                    {
+                        <div class="timeline">
+                            <div class="timeline-step @(step >= 0 ? "active" : "")">
+                                <div class="step-icon"><i class="fas fa-clock"></i></div>
+                                <div class="step-label">Chờ xác nhận</div>
+                            </div>
+                            <div class="timeline-step @(step >= 1 ? "active" : "")">
+                                <div class="step-icon"><i class="fas fa-handshake"></i></div>
+                                <div class="step-label">Đã tiếp nhận</div>
+                            </div>
+                            <div class="timeline-step @(step >= 2 ? "active" : "")">
+                                <div class="step-icon"><i class="fas fa-cog"></i></div>
+                                <div class="step-label">Đang sửa</div>
+                            </div>
+                            <div class="timeline-step @(step >= 3 ? "active" : "")">
+                                <div class="step-icon"><i class="fas fa-check-double"></i></div>
+                                <div class="step-label">Hoàn thành</div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger" style="border-radius:10px;">
+                            <i class="fas fa-times-circle me-1"></i>Lịch sửa chữa này đã bị hủy.
+                        </div>
+                    }
+
+                    <h6 class="fw-bold mt-4 mb-3"><i class="fas fa-info-circle me-1" style="color:#FF6B35;"></i>Thông tin lịch hẹn</h6>
+                    <div class="info-row">
+                        <span class="label">Khách hàng</span>
+                        <span class="value">@booking.User?.FullName</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Số điện thoại</span>
+                        <span class="value">@booking.User?.PhoneNumber</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Dịch vụ</span>
+                        <span class="value">@booking.Service?.Name</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Thiết bị</span>
+                        <span class="value">@booking.DeviceInfo</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Ngày hẹn</span>
+                        <span class="value">@booking.BookingDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(booking.IssueDescription))
+                    {
+                        <div class="info-row">
+                            <span class="label">Mô tả lỗi</span>
+                            <span class="value text-end" style="max-width:60%;">@booking.IssueDescription</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(booking.Note))
+                    {
+                        <div class="info-row">
+                            <span class="label">Ghi chú</span>
+                            <span class="value text-end" style="max-width:60%;">@booking.Note</span>
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="text-center mt-4">
+                <a asp-controller="Tracking" asp-action="Index" class="text-decoration-none" style="color:#FF6B35;font-weight:600;">
+                    <i class="fas fa-box me-1"></i>Tra cứu đơn hàng
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

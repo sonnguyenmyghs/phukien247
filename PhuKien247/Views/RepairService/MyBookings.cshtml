@@ -1,0 +1,179 @@
+@model List<RepairBooking>
+@{
+    ViewData["Title"] = "Lịch sửa của tôi";
+
+    string RepairStatusText(RepairStatus s) => s switch
+    {
+        RepairStatus.ChoXacNhan => "Chờ xác nhận",
+        RepairStatus.DaTiepNhan => "Đã tiếp nhận",
+        RepairStatus.DangSua => "Đang sửa",
+        RepairStatus.HoanThanh => "Hoàn thành",
+        RepairStatus.DaHuy => "Đã hủy",
+        _ => s.ToString()
+    };
+
+    string RepairStatusClass(RepairStatus s) => s switch
+    {
+        RepairStatus.ChoXacNhan => "bg-warning text-dark",
+        RepairStatus.DaTiepNhan => "bg-info",
+        RepairStatus.DangSua => "bg-primary",
+        RepairStatus.HoanThanh => "bg-success",
+        RepairStatus.DaHuy => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+    string RepairStatusIcon(RepairStatus s) => s switch
+    {
+        RepairStatus.ChoXacNhan => "fa-clock",
+        RepairStatus.DaTiepNhan => "fa-check",
+        RepairStatus.DangSua => "fa-cog fa-spin",
+        RepairStatus.HoanThanh => "fa-check-double",
+        RepairStatus.DaHuy => "fa-times",
+        _ => "fa-circle"
+    };
+}
+
+@section Styles {
+<style>
+    .my-bookings-hero {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        padding: 3rem 0 2rem;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .booking-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s;
+        border-left: 4px solid #FF6B35;
+    }
+    .booking-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+    .booking-id {
+        font-weight: 700;
+        color: #FF6B35;
+    }
+    .booking-row {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    .booking-row .label {
+        color: #6b7280;
+        min-width: 110px;
+    }
+    .booking-row .value {
+        color: #1f2937;
+        font-weight: 500;
+    }
+    .empty-bookings {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .empty-bookings i {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 1rem;
+    }
+</style>
+}
+
+<section class="my-bookings-hero">
+    <div class="container text-center">
+        <h1 class="fw-bold"><i class="fas fa-tools me-2"></i>Lịch sửa của tôi</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,0.75);">Xem lại các lịch sửa chữa bạn đã đặt</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" style="border-radius:10px;">
+                    <i class="fas fa-check-circle me-1"></i>@TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (Model.Count == 0)
+            {
+                <div class="empty-bookings">
+                    <i class="fas fa-calendar-times d-block"></i>
+                    <h4 class="text-muted">Bạn chưa có lịch sửa chữa nào</h4>
+                    <p class="text-muted mb-3">Hãy đặt lịch sửa chữa ngay để được hỗ trợ nhanh chóng.</p>
+                    <a asp-controller="RepairService" asp-action="Index" class="btn btn-pk">
+                        <i class="fas fa-plus me-1"></i>Đặt lịch sửa chữa
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-list me-2" style="color:#FF6B35;"></i>
+                        @Model.Count lịch sửa chữa
+                    </h5>
+                    <a asp-controller="RepairService" asp-action="Index" class="btn btn-pk btn-sm">
+                        <i class="fas fa-plus me-1"></i>Đặt lịch mới
+                    </a>
+                </div>
+
+                <div class="row g-3">
+                    @foreach (var booking in Model)
+                    {
+                        <div class="col-lg-6">
+                            <div class="booking-card h-100">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <div class="booking-id mb-1">#@booking.Id</div>
+                                        <h6 class="fw-bold mb-0">@booking.Service?.Name</h6>
+                                    </div>
+                                    <span class="badge @RepairStatusClass(booking.Status)" style="padding:0.5rem 0.85rem;border-radius:20px;font-size:0.8rem;">
+                                        <i class="fas @RepairStatusIcon(booking.Status) me-1"></i>@RepairStatusText(booking.Status)
+                                    </span>
+                                </div>
+
+                                <div class="booking-row">
+                                    <span class="label"><i class="fas fa-mobile-alt me-1"></i>Thiết bị:</span>
+                                    <span class="value">@booking.DeviceInfo</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(booking.IssueDescription))
+                                {
+                                    <div class="booking-row">
+                                        <span class="label"><i class="fas fa-bug me-1"></i>Lỗi:</span>
+                                        <span class="value">@booking.IssueDescription</span>
+                                    </div>
+                                }
+                                <div class="booking-row">
+                                    <span class="label"><i class="far fa-calendar me-1"></i>Ngày hẹn:</span>
+                                    <span class="value">@booking.BookingDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="booking-row">
+                                    <span class="label"><i class="far fa-clock me-1"></i>Đặt ngày:</span>
+                                    <span class="value text-muted">@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(booking.Note))
+                                {
+                                    <div class="booking-row">
+                                        <span class="label"><i class="fas fa-sticky-note me-1"></i>Ghi chú:</span>
+                                        <span class="value">@booking.Note</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

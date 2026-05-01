@@ -15,7 +15,7 @@ public class ProductController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(string? search, int? categoryId, int? brandId, string? sort, int page = 1)
+    public async Task<IActionResult> Index(string? search, int? categoryId, int? brandId, decimal? minPrice, decimal? maxPrice, string? sort, int page = 1)
     {
         var query = _context.Products
             .Include(p => p.Category)
@@ -38,6 +38,17 @@ public class ProductController : Controller
         if (brandId.HasValue)
         {
             query = query.Where(p => p.BrandId == brandId.Value);
+        }
+
+        // Price filter (use SalePrice when available else Price)
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => (p.SalePrice ?? p.Price) >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => (p.SalePrice ?? p.Price) <= maxPrice.Value);
         }
 
         // Sort
@@ -69,6 +80,8 @@ public class ProductController : Controller
         ViewBag.CurrentPage = page;
         ViewBag.TotalPages = totalPages;
         ViewBag.TotalItems = totalItems;
+        ViewBag.MinPrice = minPrice;
+        ViewBag.MaxPrice = maxPrice;
 
         return View(products);
     }

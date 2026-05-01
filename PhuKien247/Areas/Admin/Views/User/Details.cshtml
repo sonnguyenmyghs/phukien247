@@ -1,0 +1,273 @@
+@using PhuKien247.Areas.Admin.Controllers
+@model UserDetailsViewModel
+@{
+    ViewData["Title"] = "Chi tiết khách hàng";
+}
+
+@section Styles {
+<style>
+    .info-card { border-radius: 14px; background: #fff; }
+    .info-card .card-header {
+        background: none; border-bottom: 1px solid #f3f4f6;
+        padding: 18px 24px; font-weight: 700; color: #1f2937;
+    }
+    .info-card .card-body { padding: 22px 24px; }
+    .user-hero {
+        background: linear-gradient(135deg, #FF6B35, #ff8f5e);
+        border-radius: 16px; padding: 26px;
+        color: #fff; margin-bottom: 24px;
+    }
+    .user-hero-avatar {
+        width: 70px; height: 70px; border-radius: 50%;
+        background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.4);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 1.6rem;
+    }
+    .info-row { display: flex; padding: 8px 0; border-bottom: 1px dashed #f3f4f6; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label {
+        flex: 0 0 140px; color: #6b7280; font-size: 0.85rem; font-weight: 600;
+    }
+    .info-value { flex: 1; color: #1f2937; font-size: 0.9rem; }
+    .badge-role {
+        border-radius: 20px; padding: 4px 12px;
+        font-weight: 600; font-size: 0.75rem;
+    }
+    .badge-admin { background: #fee2e2; color: #991b1b; }
+    .badge-customer { background: #dbeafe; color: #1e40af; }
+    .badge-status {
+        border-radius: 20px; padding: 4px 12px;
+        font-weight: 600; font-size: 0.78rem;
+    }
+    .badge-active { background: #d1fae5; color: #065f46; }
+    .badge-locked { background: #fee2e2; color: #991b1b; }
+    .mini-table th {
+        font-size: 0.74rem; text-transform: uppercase;
+        color: #6b7280; font-weight: 600; padding: 10px 12px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .mini-table td {
+        padding: 10px 12px; font-size: 0.85rem;
+        border-bottom: 1px solid #f9fafb;
+    }
+    .btn-cancel {
+        border-radius: 10px; padding: 9px 24px; font-weight: 600;
+        border: 1px solid #d1d5db; color: #6b7280; background: #fff;
+    }
+    .btn-cancel:hover { background: #f3f4f6; color: #374151; }
+</style>
+}
+
+@{
+    var u = Model.User;
+    var initial = !string.IsNullOrEmpty(u.FullName) ? u.FullName.Substring(0, 1).ToUpper() : "?";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="fw-bold mb-1" style="color:#1f2937;">Chi tiết khách hàng</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Thông tin chi tiết và lịch sử hoạt động</p>
+    </div>
+    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="btn btn-cancel">
+        <i class="fas fa-arrow-left me-1"></i> Quay lại
+    </a>
+</div>
+
+<!-- Hero -->
+<div class="user-hero d-flex align-items-center gap-3">
+    <div class="user-hero-avatar">@initial</div>
+    <div class="flex-grow-1">
+        <h4 class="mb-1 fw-bold">@u.FullName</h4>
+        <div style="opacity:0.9;font-size:0.9rem;">@u.Email</div>
+        <div class="mt-2 d-flex gap-2">
+            @foreach (var role in Model.Roles)
+            {
+                <span class="badge-role @(role == "Admin" ? "badge-admin" : "badge-customer")">@role</span>
+            }
+            @if (Model.IsLocked)
+            {
+                <span class="badge-status badge-locked"><i class="fas fa-lock me-1"></i>Đã khóa</span>
+            }
+            else
+            {
+                <span class="badge-status badge-active"><i class="fas fa-check-circle me-1"></i>Hoạt động</span>
+            }
+        </div>
+    </div>
+    <div>
+        <form asp-area="Admin" asp-controller="User" asp-action="ToggleLock" asp-route-id="@u.Id"
+              method="post" class="d-inline"
+              onsubmit="return confirm('Bạn có chắc?');">
+            @Html.AntiForgeryToken()
+            @if (Model.IsLocked)
+            {
+                <button type="submit" class="btn btn-light fw-semibold" style="border-radius:10px;">
+                    <i class="fas fa-unlock me-1"></i> Mở khóa
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-light fw-semibold" style="border-radius:10px;color:#ef4444;">
+                    <i class="fas fa-lock me-1"></i> Khóa tài khoản
+                </button>
+            }
+        </form>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Personal Info -->
+    <div class="col-lg-5">
+        <div class="card info-card">
+            <div class="card-header">
+                <i class="fas fa-id-card me-2" style="color:#FF6B35;"></i> Thông tin cá nhân
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <div class="info-label">Họ tên</div>
+                    <div class="info-value">@u.FullName</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">@u.Email</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Số điện thoại</div>
+                    <div class="info-value">@(u.PhoneNumber ?? "-")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Địa chỉ</div>
+                    <div class="info-value">@(u.Address ?? "-")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Ngày tạo</div>
+                    <div class="info-value">@u.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email xác nhận</div>
+                    <div class="info-value">
+                        @if (u.EmailConfirmed)
+                        {
+                            <span class="text-success"><i class="fas fa-check-circle"></i> Đã xác nhận</span>
+                        }
+                        else
+                        {
+                            <span class="text-warning"><i class="fas fa-exclamation-circle"></i> Chưa xác nhận</span>
+                        }
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Vai trò</div>
+                    <div class="info-value">
+                        @if (Model.Roles.Any())
+                        {
+                            foreach (var r in Model.Roles)
+                            {
+                                <span class="badge-role @(r == "Admin" ? "badge-admin" : "badge-customer") me-1">@r</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats / activity -->
+    <div class="col-lg-7">
+        <!-- Orders -->
+        <div class="card info-card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-receipt me-2" style="color:#FF6B35;"></i> Lịch sử đơn hàng</span>
+                <span class="badge" style="background:#e0f2fe;color:#0284c7;border-radius:20px;padding:4px 12px;font-weight:600;">
+                    @Model.Orders.Count đơn
+                </span>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Orders.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table mini-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Mã</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var o in Model.Orders.Take(15))
+                                {
+                                    <tr>
+                                        <td><strong>#@o.Id</strong></td>
+                                        <td style="color:#FF6B35;font-weight:700;">@o.TotalAmount.ToString("N0") đ</td>
+                                        <td><span class="badge bg-secondary">@o.Status</span></td>
+                                        <td class="text-muted">@o.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-receipt fa-2x mb-2 d-block" style="opacity:0.3;"></i>
+                        Chưa có đơn hàng nào
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Repair bookings -->
+        <div class="card info-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-screwdriver-wrench me-2" style="color:#FF6B35;"></i> Lịch sửa chữa</span>
+                <span class="badge" style="background:#fef3c7;color:#92400e;border-radius:20px;padding:4px 12px;font-weight:600;">
+                    @Model.RepairBookings.Count lịch
+                </span>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.RepairBookings.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table mini-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Mã</th>
+                                    <th>Dịch vụ</th>
+                                    <th>Thiết bị</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày hẹn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var b in Model.RepairBookings.Take(15))
+                                {
+                                    <tr>
+                                        <td><strong>#@b.Id</strong></td>
+                                        <td>@(b.Service?.Name ?? "-")</td>
+                                        <td class="text-muted">@b.DeviceInfo</td>
+                                        <td><span class="badge bg-secondary">@b.Status</span></td>
+                                        <td class="text-muted">@b.BookingDate.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-screwdriver-wrench fa-2x mb-2 d-block" style="opacity:0.3;"></i>
+                        Chưa có lịch sửa chữa nào
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

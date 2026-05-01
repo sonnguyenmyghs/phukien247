@@ -1,0 +1,159 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ của tôi";
+}
+
+@section Styles {
+<style>
+    .profile-wrapper { padding: 50px 0 80px; background: linear-gradient(135deg, #fff7f3 0%, #ffe8db 100%); min-height: 80vh; }
+    .profile-card { background: #fff; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); overflow: hidden; }
+    .profile-side { background: linear-gradient(135deg, #FF6B35 0%, #f7971e 100%); color: #fff; padding: 40px 28px; text-align: center; }
+    .profile-avatar {
+        width: 110px; height: 110px; border-radius: 50%; background: #fff;
+        margin: 0 auto 18px; display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; font-weight: 800; color: #FF6B35; box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+    .profile-email { font-size: 0.85rem; opacity: 0.9; word-break: break-all; }
+    .profile-meta { font-size: 0.78rem; opacity: 0.8; margin-top: 12px; }
+    .profile-side .stat-mini {
+        background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; margin-top: 18px;
+        backdrop-filter: blur(8px);
+    }
+    .profile-content { padding: 32px 36px; }
+    .nav-tabs-pk { border-bottom: 2px solid #f3f4f6; margin-bottom: 28px; }
+    .nav-tabs-pk .nav-link {
+        color: #6b7280; font-weight: 600; padding: 12px 20px; border: none;
+        border-bottom: 3px solid transparent; background: none;
+    }
+    .nav-tabs-pk .nav-link.active {
+        color: #FF6B35; border-bottom-color: #FF6B35; background: none;
+    }
+    .nav-tabs-pk .nav-link:hover { color: #FF6B35; border-color: transparent; }
+    .form-control:focus { border-color: #FF6B35; box-shadow: 0 0 0 0.2rem rgba(255,107,53,.15); }
+    .btn-pk-save {
+        background: linear-gradient(135deg, #FF6B35, #f7971e); color: #fff;
+        border: none; padding: 10px 28px; border-radius: 10px; font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-pk-save:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,0.3); color:#fff; }
+    .input-readonly { background: #f9fafb; cursor: not-allowed; }
+    .form-label { font-weight: 600; color: #1f2937; }
+</style>
+}
+
+<section class="profile-wrapper">
+    <div class="container">
+        <div class="profile-card">
+            <div class="row g-0">
+                <div class="col-lg-4 profile-side">
+                    <div class="profile-avatar">
+                        @(string.IsNullOrEmpty(Model.FullName) ? "?" : Model.FullName.Substring(0,1).ToUpper())
+                    </div>
+                    <div class="profile-name">@Model.FullName</div>
+                    <div class="profile-email"><i class="fas fa-envelope me-1"></i>@Model.Email</div>
+                    <div class="profile-meta">
+                        <i class="fas fa-calendar-check me-1"></i>Tham gia: @Model.CreatedAt.ToString("dd/MM/yyyy")
+                    </div>
+                    <div class="stat-mini">
+                        <div style="font-size:0.78rem;opacity:0.85;">Tài khoản</div>
+                        <div style="font-weight:700;font-size:1rem;margin-top:2px;">
+                            <i class="fas fa-shield-check me-1"></i>Đã xác thực
+                        </div>
+                    </div>
+                    <a asp-controller="Order" asp-action="MyOrders" class="btn btn-light w-100 mt-3" style="border-radius:10px;font-weight:600;color:#FF6B35;">
+                        <i class="fas fa-clipboard-list me-1"></i>Đơn hàng của tôi
+                    </a>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="profile-content">
+                        @if (TempData["Success"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show">
+                                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <ul class="nav nav-tabs-pk" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabInfo" type="button">
+                                    <i class="fas fa-user-edit me-1"></i>Thông tin cá nhân
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPwd" type="button">
+                                    <i class="fas fa-key me-1"></i>Đổi mật khẩu
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Tab Info -->
+                            <div class="tab-pane fade show active" id="tabInfo">
+                                <form asp-action="Update" method="post">
+                                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" style="display: @(ViewData.ModelState.ErrorCount > 0 ? "block" : "none")"></div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="FullName" class="form-label"></label>
+                                        <input asp-for="FullName" class="form-control" />
+                                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Email" class="form-label"></label>
+                                        <input asp-for="Email" class="form-control input-readonly" readonly />
+                                        <small class="text-muted">Email không thể thay đổi.</small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="PhoneNumber" class="form-label"></label>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="Ví dụ: 0901234567" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label asp-for="Address" class="form-label"></label>
+                                        <textarea asp-for="Address" class="form-control" rows="3" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành"></textarea>
+                                        <span asp-validation-for="Address" class="text-danger small"></span>
+                                    </div>
+
+                                    <button type="submit" class="btn-pk-save">
+                                        <i class="fas fa-save me-1"></i>Lưu thay đổi
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Tab Password -->
+                            <div class="tab-pane fade" id="tabPwd">
+                                <form asp-action="ChangePassword" method="post">
+                                    <div class="mb-3">
+                                        <label class="form-label">Mật khẩu hiện tại</label>
+                                        <input name="OldPassword" type="password" class="form-control" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Mật khẩu mới</label>
+                                        <input name="NewPassword" type="password" class="form-control" minlength="6" required />
+                                        <small class="text-muted">Tối thiểu 6 ký tự.</small>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Xác nhận mật khẩu mới</label>
+                                        <input name="ConfirmPassword" type="password" class="form-control" minlength="6" required />
+                                    </div>
+                                    <button type="submit" class="btn-pk-save">
+                                        <i class="fas fa-key me-1"></i>Đổi mật khẩu
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
