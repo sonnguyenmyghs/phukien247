@@ -42,7 +42,7 @@ public class Order
     public string ShippingAddress { get; set; } = string.Empty;
 
     [MaxLength(20)]
-    [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+    [RegularExpression(@"^(0|\+84)[0-9]{9,10}$", ErrorMessage = "Số điện thoại không hợp lệ")]
     public string PhoneNumber { get; set; } = string.Empty;
 
     [MaxLength(500)]
